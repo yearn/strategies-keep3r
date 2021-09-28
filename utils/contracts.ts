@@ -54,3 +54,10 @@ export const vaultsRegistryHelper = {
   polygon: '',
   ftm: '0x3030c9462BD9AFeCE7536B66cc75071dE687Af4A',
 };
+
+export const tendV2Keep3rJob = {
+  mainnet: '0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3',
+};
+export const betaTendV2Keep3rJob = {
+  mainnet: '0xf72D7E44ec3F79379912B8d0f661bE954a101159',
+};
