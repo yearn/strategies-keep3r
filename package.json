@@ -29,7 +29,7 @@
     "test": "TEST=true npx hardhat compile && TEST=true npx hardhat test",
     "test:e2e": "yarn test ./test/e2e/*.spec.ts",
     "test:integration": "yarn test ./test/integration/*.spec.ts",
-    "test:gas": "yarn test ./test/e2e/*.spec.ts test/unit/*.spec.ts",
+    "test:gas": "yarn test ./test/integration/*.spec.ts test/unit/*.spec.ts",
     "test:unit": "yarn test test/unit/*.spec.ts",
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
