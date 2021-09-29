@@ -6,10 +6,7 @@ const escrowContracts = config.contracts.mainnet.escrow;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
 
-import {
-  FlashbotsBundleProvider,
-  FlashbotsBundleResolution,
-} from '@flashbots/ethers-provider-bundle';
+import { FlashbotsBundleProvider, FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm('Do you wish to broadcast flashbot-tx?');
@@ -17,41 +14,26 @@ const prompt = new Confirm('Do you wish to broadcast flashbot-tx?');
 async function main() {
   const [owner] = await ethers.getSigners();
   const provider = ethers.getDefaultProvider();
-  const signer = new ethers.Wallet(
-    '0x' + config.accounts.mainnet.privateKey
-  ).connect(provider);
+  const signer = new ethers.Wallet('0x' + config.accounts.mainnet.privateKey).connect(provider);
   let nonce = ethers.BigNumber.from(await signer.getTransactionCount());
 
   const flashbotsSigner = Wallet.createRandom();
-  const flashbotsProvider = await FlashbotsBundleProvider.create(
-    provider,
-    flashbotsSigner
-  );
+  const flashbotsProvider = await FlashbotsBundleProvider.create(provider, flashbotsSigner);
   const blockNumber = await ethers.provider.getBlockNumber();
   // const minTimestamp = (await provider.getBlock(blockNumber)).timestamp
   // const maxTimestamp = minTimestamp + 120
 
-  const StealthVault: ContractFactory = await ethers.getContractFactory(
-    'StealthVault'
-  );
+  const StealthVault: ContractFactory = await ethers.getContractFactory('StealthVault');
   const stealthVault = await StealthVault.deploy();
-  const StealthRelayer: ContractFactory = await ethers.getContractFactory(
-    'StealthRelayer'
-  );
-  const stealthRelayer = (
-    await StealthRelayer.deploy(stealthVault.address)
-  ).connect(signer);
+  const StealthRelayer: ContractFactory = await ethers.getContractFactory('StealthRelayer');
+  const stealthRelayer = (await StealthRelayer.deploy(stealthVault.address)).connect(signer);
   // const stealthRelayer = await ethers.getContractAt(
   //   'StealthRelayer',
   //   config.contracts.mainnet.stealthRelayer
   // );
 
   // Setup crv strategy keep3r
-  const crvStrategyKeep3r = await ethers.getContractAt(
-    'CrvStrategyKeep3rJob',
-    config.contracts.mainnet.jobs.crvStrategyKeep3rJob,
-    signer
-  );
+  const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3rJob', config.contracts.mainnet.jobs.crvStrategyKeep3rJob, signer);
 
   const harvestTx = await crvStrategyKeep3r.populateTransaction.forceWork(
     '0xC59601F0CC49baa266891b7fc63d2D5FE097A79D', // pool3
@@ -88,10 +70,7 @@ async function main() {
     },
   ]);
 
-  const simulation = await flashbotsProvider.simulate(
-    signedBundle,
-    blockNumber + 2
-  );
+  const simulation = await flashbotsProvider.simulate(signedBundle, blockNumber + 2);
 
   console.log('simulation');
   console.log(simulation);

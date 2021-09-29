@@ -29,9 +29,7 @@ function promptAndSubmit() {
           method: 'hardhat_impersonateAccount',
           params: [config.accounts.mainnet.deployer],
         });
-        deployer = owner.provider.getUncheckedSigner(
-          config.accounts.mainnet.deployer
-        );
+        deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
       }
 
       console.log('using vaults.finance/all API as registry');
@@ -101,28 +99,16 @@ function promptAndSubmit() {
         // { address: '0xF0252a99691D591A5A458b9b4931bF1025BF6Ac3' }, //wbtc
       ];
 
-      const harvestV2Keep3rJob = await ethers.getContractAt(
-        'HarvestV2Keep3rJob',
-        mainnetContracts.oldJobs.harvestV2Keep3rJob
-      );
-      const tendV2Keep3rJob = await ethers.getContractAt(
-        'TendV2Keep3rJob',
-        mainnetContracts.jobs.tendV2Keep3rJob
-      );
+      const harvestV2Keep3rJob = await ethers.getContractAt('HarvestV2Keep3rJob', mainnetContracts.oldJobs.harvestV2Keep3rJob);
+      const tendV2Keep3rJob = await ethers.getContractAt('TendV2Keep3rJob', mainnetContracts.jobs.tendV2Keep3rJob);
 
       for (const strategy of v2StrategiesBAG) {
-        harvestV2Keep3rJob
-          .connect(deployer)
-          .addStrategy(strategy.address, 1000000);
+        harvestV2Keep3rJob.connect(deployer).addStrategy(strategy.address, 1000000);
         v2Strategies.push(strategy);
       }
 
       for (const strategy of v2Strategies) {
-        strategy.contract = await ethers.getContractAt(
-          'IBaseStrategy',
-          strategy.address,
-          deployer
-        );
+        strategy.contract = await ethers.getContractAt('IBaseStrategy', strategy.address, deployer);
 
         // keep3r setup and contract overwrite
         strategy.keeper = await strategy.contract.callStatic.keeper();
@@ -130,14 +116,8 @@ function promptAndSubmit() {
           method: 'hardhat_impersonateAccount',
           params: [strategy.keeper],
         });
-        strategy.keeperAccount = owner.provider.getUncheckedSigner(
-          strategy.keeper
-        );
-        strategy.contract = await ethers.getContractAt(
-          'IBaseStrategy',
-          strategy.address,
-          strategy.keeperAccount
-        );
+        strategy.keeperAccount = owner.provider.getUncheckedSigner(strategy.keeper);
+        strategy.contract = await ethers.getContractAt('IBaseStrategy', strategy.address, strategy.keeperAccount);
         (await ethers.getContractFactory('ForceETH')).deploy(strategy.keeper, {
           value: e18.mul(100),
         });
@@ -145,31 +125,20 @@ function promptAndSubmit() {
         strategy.vault = await strategy.contract.callStatic.vault();
         strategy.want = await strategy.contract.callStatic.want();
         strategy.name = await strategy.contract.callStatic.name();
-        strategy.wantContract = await ethers.getContractAt(
-          'ERC20Mock',
-          strategy.want,
-          strategy.keeperAccount
-        );
+        strategy.wantContract = await ethers.getContractAt('ERC20Mock', strategy.want, strategy.keeperAccount);
         strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
-        strategy.wantBalancePre =
-          await strategy.wantContract.callStatic.balanceOf(strategy.address);
+        strategy.wantBalancePre = await strategy.wantContract.callStatic.balanceOf(strategy.address);
         strategy.decimals = await strategy.wantContract.callStatic.decimals();
         // init default
-        strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions['default'],
-          strategy.vault,
-          strategy.keeperAccount
-        );
+        strategy.vaultContract = await ethers.getContractAt(vaultAPIVersions['default'], strategy.vault, strategy.keeperAccount);
         strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
         strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions[strategy.vaultAPIVersion] ||
-            vaultAPIVersions['0.3.2'],
+          vaultAPIVersions[strategy.vaultAPIVersion] || vaultAPIVersions['0.3.2'],
           strategy.vault,
           strategy.keeperAccount
         );
 
-        strategy.vaultTotalAssets =
-          await strategy.vaultContract.callStatic.totalAssets();
+        strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
       }
 
       for (const strategy of v2Strategies) {
@@ -177,17 +146,10 @@ function promptAndSubmit() {
         let harvestable;
         let tendable;
         try {
-          harvestable = await harvestV2Keep3rJob.callStatic.workable(
-            strategy.address
-          );
-          tendable = await tendV2Keep3rJob.callStatic.workable(
-            strategy.address
-          );
+          harvestable = await harvestV2Keep3rJob.callStatic.workable(strategy.address);
+          tendable = await tendV2Keep3rJob.callStatic.workable(strategy.address);
         } catch (error) {
-          if (
-            error.message.indexOf('V2Keep3rJob::workable:strategy-not-added') ==
-            -1
-          ) {
+          if (error.message.indexOf('V2Keep3rJob::workable:strategy-not-added') == -1) {
             console.log(error.message);
           }
         }
@@ -197,14 +159,8 @@ function promptAndSubmit() {
 
         console.log('harvestable:', harvestable, 'tendable:', tendable);
 
-        if (harvestable)
-          console.log(
-            `harvest with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
-          );
-        if (tendable)
-          console.log(
-            `tend with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
-          );
+        if (harvestable) console.log(`harvest with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`);
+        if (tendable) console.log(`tend with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`);
         console.log();
       }
 
@@ -217,22 +173,14 @@ function promptAndSubmit() {
       }
 
       for (const strategy of v2Strategies) {
-        const params = await strategy.vaultContract.callStatic.strategies(
-          strategy.address
-        );
+        const params = await strategy.vaultContract.callStatic.strategies(strategy.address);
         strategy.paramsPost = await getStrategyParams(strategy);
-        strategy.wantBalancePost =
-          await strategy.wantContract.callStatic.balanceOf(strategy.address);
+        strategy.wantBalancePost = await strategy.wantContract.callStatic.balanceOf(strategy.address);
       }
 
       for (const strategy of v2Strategies) {
         try {
-          console.log(
-            'harvestable:',
-            strategy.harvestable,
-            'tendable:',
-            strategy.tendable
-          );
+          console.log('harvestable:', strategy.harvestable, 'tendable:', strategy.tendable);
           logData(strategy, strategy.paramsPre);
           logVaultData(strategy, strategy.paramsPre);
           logParams(strategy, strategy.paramsPre);
@@ -293,9 +241,7 @@ function logParams(strategy, params) {
       'minDebtPerHarvest:',
       bnToDecimal(params.minDebtPerHarvest, strategy.decimals),
       'maxDebtPerHarvest:',
-      params.maxDebtPerHarvest.gt(e18.mul(e18))
-        ? 'infinity'
-        : bnToDecimal(params.maxDebtPerHarvest, strategy.decimals),
+      params.maxDebtPerHarvest.gt(e18.mul(e18)) ? 'infinity' : bnToDecimal(params.maxDebtPerHarvest, strategy.decimals),
       'totalDebt:',
       bnToDecimal(params.totalDebt, strategy.decimals),
       'totalGain:',
@@ -321,25 +267,14 @@ function logCompare(strategy, paramsPre, paramsPost) {
   let paramsCompare = '';
   for (const param of params) {
     if (Object.keys(paramsPre).indexOf(param) == -1) continue;
-    paramsCompare +=
-      param +
-      ': ' +
-      bnToDecimal(paramsPost[param].sub(paramsPre[param]), strategy.decimals) +
-      ' ';
+    paramsCompare += param + ': ' + bnToDecimal(paramsPost[param].sub(paramsPre[param]), strategy.decimals) + ' ';
   }
-  paramsCompare +=
-    'wantBalance: ' +
-    bnToDecimal(
-      strategy.wantBalancePost.sub(strategy.wantBalancePre),
-      strategy.decimals
-    );
+  paramsCompare += 'wantBalance: ' + bnToDecimal(strategy.wantBalancePost.sub(strategy.wantBalancePre), strategy.decimals);
   console.log(paramsCompare);
 }
 
 async function getStrategyParams(strategy) {
-  const params = await strategy.vaultContract.callStatic.strategies(
-    strategy.address
-  );
+  const params = await strategy.vaultContract.callStatic.strategies(strategy.address);
   if (strategy.vaultAPIVersion === '0.3.2')
     return {
       performanceFee: params.performanceFee,

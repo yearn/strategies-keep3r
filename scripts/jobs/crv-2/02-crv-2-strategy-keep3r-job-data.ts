@@ -20,23 +20,13 @@ function promptAndSubmit(): Promise<void | Error> {
 
       const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
 
-      const strategies =
-        await crvStrategyKeep3rStealthJob2.callStatic.strategies();
+      const strategies = await crvStrategyKeep3rStealthJob2.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest =
-          await crvStrategyKeep3rStealthJob2.callStatic.requiredHarvest(
-            strategy
-          );
-        const requiredEarn =
-          await crvStrategyKeep3rStealthJob2.callStatic.requiredEarn(strategy);
-        const strategyData = crvStrategies.find(
-          (strategyData: any) => strategyData.address == strategy
-        );
-        const strategyContract = await ethers.getContractAt(
-          'IBaseStrategy',
-          strategy
-        );
+        const requiredHarvest = await crvStrategyKeep3rStealthJob2.callStatic.requiredHarvest(strategy);
+        const requiredEarn = await crvStrategyKeep3rStealthJob2.callStatic.requiredEarn(strategy);
+        const strategyData = crvStrategies.find((strategyData: any) => strategyData.address == strategy);
+        const strategyContract = await ethers.getContractAt('IBaseStrategy', strategy);
         const profitFactor = await strategyContract.profitFactor();
         const want = await strategyContract.callStatic.want();
         const wantContract = await ethers.getContractAt(
@@ -45,20 +35,11 @@ function promptAndSubmit(): Promise<void | Error> {
         );
         const symbol = await wantContract.callStatic.symbol();
 
-        console.log(
-          strategyData?.name,
-          symbol,
-          strategy,
-          requiredHarvest.toString(),
-          requiredEarn.toString(),
-          profitFactor.toString()
-        );
+        console.log(strategyData?.name, symbol, strategy, requiredHarvest.toString(), requiredEarn.toString(), profitFactor.toString());
       }
       resolve();
     } catch (err) {
-      reject(
-        `Error while checking workable strategies on CrvStrategyKeep3rStealthJob2 contract: ${err.message}`
-      );
+      reject(`Error while checking workable strategies on CrvStrategyKeep3rStealthJob2 contract: ${err.message}`);
     }
   });
 }

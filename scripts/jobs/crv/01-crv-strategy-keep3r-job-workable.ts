@@ -15,40 +15,23 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('');
     try {
       // Setup CrvStrategyKeep3rJob
-      const crvStrategyKeep3rJob = await ethers.getContractAt(
-        'CrvStrategyKeep3rJob',
-        mainnetContracts.proxyJobs.crvStrategyKeep3rJob
-      );
+      const crvStrategyKeep3rJob = await ethers.getContractAt('CrvStrategyKeep3rJob', mainnetContracts.proxyJobs.crvStrategyKeep3rJob);
 
       const strategies = await crvStrategyKeep3rJob.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest =
-          await crvStrategyKeep3rJob.callStatic.requiredHarvest(strategy);
-        const harvest = await crvStrategyKeep3rJob.callStatic.calculateHarvest(
-          strategy
-        );
-        const strategyData = v1CrvStrategies.find(
-          (strategyData: any) => strategyData.address == strategy
-        );
+        const requiredHarvest = await crvStrategyKeep3rJob.callStatic.requiredHarvest(strategy);
+        const harvest = await crvStrategyKeep3rJob.callStatic.calculateHarvest(strategy);
+        const strategyData = v1CrvStrategies.find((strategyData: any) => strategyData.address == strategy);
         if (!strategyData) continue;
         // const workable = maxHarvestPeriod.add(lastWorkAt).lt()
-        console.log(
-          'strategy',
-          strategyData.name,
-          'requiredHarvest:',
-          bnToDecimal(requiredHarvest),
-          'harvests:',
-          bnToDecimal(harvest)
-        );
+        console.log('strategy', strategyData.name, 'requiredHarvest:', bnToDecimal(requiredHarvest), 'harvests:', bnToDecimal(harvest));
         const workable = harvest.gte(requiredHarvest);
         console.log('workable:', workable, workable ? strategy : '');
       }
       resolve();
     } catch (err) {
-      reject(
-        `Error while checking workable strategies on CrvStrategyKeep3rJob contract: ${err.message}`
-      );
+      reject(`Error while checking workable strategies on CrvStrategyKeep3rJob contract: ${err.message}`);
     }
   });
 }

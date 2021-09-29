@@ -20,15 +20,10 @@ function run() {
         method: 'hardhat_impersonateAccount',
         params: [config.accounts.mainnet.keeper],
       });
-      const keeper = owner.provider.getUncheckedSigner(
-        config.accounts.mainnet.keeper
-      );
+      const keeper = owner.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
 
       // Setup Keep3rProxyJob
-      const keep3rProxyJob = await ethers.getContractAt(
-        'Keep3rProxyJob',
-        escrowContracts.proxyJob
-      );
+      const keep3rProxyJob = await ethers.getContractAt('Keep3rProxyJob', escrowContracts.proxyJob);
       // Important! use callStatic for all methods (even work) to avoid spending gas
       // only send work transaction if callStatic.work succedded,
       // even if workable is true, the job might not have credits to pay and the work tx will revert
@@ -50,10 +45,7 @@ function run() {
           await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
           await keep3rProxyJob.connect(keeper).work(job, workData);
           console.log('worked!');
-          console.log(
-            'workable',
-            await keep3rProxyJob.callStatic.workable(job)
-          );
+          console.log('workable', await keep3rProxyJob.callStatic.workable(job));
         } catch (error) {
           console.log('workable error:', error.message);
         }

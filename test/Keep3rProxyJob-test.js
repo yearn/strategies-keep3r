@@ -1,13 +1,7 @@
 const { expect } = require('chai');
 const { utils } = require('ethers');
 const config = require('../.config.json');
-const {
-  e18,
-  ZERO_ADDRESS,
-  SIX_HOURS,
-  gwei,
-  bnToDecimal,
-} = require('../utils/web3-utils');
+const { e18, ZERO_ADDRESS, SIX_HOURS, gwei, bnToDecimal } = require('../utils/web3-utils');
 const Actions = {
   0: 'none',
   1: 'addLiquidityToJob',
@@ -32,84 +26,50 @@ describe('Keep3rProxyJob', function () {
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.keep3rGovernance],
     });
-    const keep3rGovernance = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.keep3rGovernance
-    );
+    const keep3rGovernance = owner.provider.getUncheckedSigner(config.accounts.mainnet.keep3rGovernance);
     // Setup deployer
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.deployer],
     });
-    const deployer = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.deployer
-    );
+    const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     // impersonate keeper
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.keeper],
     });
-    const keeper = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.keeper
-    );
+    const keeper = owner.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
     // impersonate lpWhale
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: ['0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44'],
     });
-    const lpWhale = owner.provider.getUncheckedSigner(
-      '0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44'
-    );
+    const lpWhale = owner.provider.getUncheckedSigner('0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44');
     // impersonate multisig
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.publicKey],
     });
-    const multisig = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.publicKey
-    );
+    const multisig = owner.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
 
-    const keep3r = await ethers.getContractAt(
-      'IKeep3rV1',
-      escrowContracts.keep3r,
-      keep3rGovernance
-    );
-    const Keep3rEscrow = await ethers.getContractFactory(
-      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow'
-    );
+    const keep3r = await ethers.getContractAt('IKeep3rV1', escrowContracts.keep3r, keep3rGovernance);
+    const Keep3rEscrow = await ethers.getContractFactory('contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow');
     const Keep3rProxyJob = await ethers.getContractFactory('Keep3rProxyJob');
-    const Keep3rProxyJobV2 = await ethers.getContractFactory(
-      'Keep3rProxyJobV2'
-    );
+    const Keep3rProxyJobV2 = await ethers.getContractFactory('Keep3rProxyJobV2');
     const Keep3rEscrowJob = await ethers.getContractFactory('Keep3rEscrowJob');
 
-    const keep3rEscrow1 = await ethers.getContractAt(
-      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow',
-      escrowContracts.escrow1,
-      deployer
-    );
-    const keep3rEscrow2 = await ethers.getContractAt(
-      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow',
-      escrowContracts.escrow2,
-      deployer
-    );
+    const keep3rEscrow1 = await ethers.getContractAt('contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow', escrowContracts.escrow1, deployer);
+    const keep3rEscrow2 = await ethers.getContractAt('contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow', escrowContracts.escrow2, deployer);
 
     // Add LPs to escrows
-    const lpContract = await ethers.getContractAt(
-      'ERC20Mock',
-      escrowContracts.lpToken,
-      lpWhale
-    );
+    const lpContract = await ethers.getContractAt('ERC20Mock', escrowContracts.lpToken, lpWhale);
     await lpContract.transfer(escrowContracts.escrow1, e18.mul(100), {
       gasPrice: 0,
     });
     await lpContract.transfer(escrowContracts.escrow2, e18.mul(100), {
       gasPrice: 0,
     });
-    const oldKeep3rEscrowJob = await ethers.getContractAt(
-      'Keep3rEscrowJob',
-      '0x83A34a6469dbFd7654aE6D842d20977E89CcD73D',
-      deployer
-    );
+    const oldKeep3rEscrowJob = await ethers.getContractAt('Keep3rEscrowJob', '0x83A34a6469dbFd7654aE6D842d20977E89CcD73D', deployer);
 
     // const keep3rProxyJob = await ethers.getContractAt(
     //   'Keep3rProxyJob',
@@ -177,16 +137,8 @@ describe('Keep3rProxyJob', function () {
     // await keep3rProxyJob.connect(keeper).work(vaultKeep3rJob.address, workData);
 
     // Deploy CRV Job
-    const CrvStrategyKeep3rJob = await ethers.getContractFactory(
-      'CrvStrategyKeep3rJob'
-    );
-    const crvStrategyKeep3rJob = (
-      await CrvStrategyKeep3rJob.deploy(
-        mechanicsContracts.registry,
-        keep3rProxyJob.address,
-        1
-      )
-    ).connect(keeper);
+    const CrvStrategyKeep3rJob = await ethers.getContractFactory('CrvStrategyKeep3rJob');
+    const crvStrategyKeep3rJob = (await CrvStrategyKeep3rJob.deploy(mechanicsContracts.registry, keep3rProxyJob.address, 1)).connect(keeper);
 
     await keep3rProxyJob.addValidJob(
       crvStrategyKeep3rJob.address,
@@ -195,32 +147,15 @@ describe('Keep3rProxyJob', function () {
     );
 
     const ycrvStrategyAddress = '0x07DB4B9b3951094B9E278D336aDf46a036295DE7';
-    const ycrvStrategy = await ethers.getContractAt(
-      'StrategyCurveYVoterProxy',
-      ycrvStrategyAddress,
-      multisig
-    );
+    const ycrvStrategy = await ethers.getContractAt('StrategyCurveYVoterProxy', ycrvStrategyAddress, multisig);
     await ycrvStrategy.setStrategist(crvStrategyKeep3rJob.address);
-    await crvStrategyKeep3rJob
-      .connect(owner)
-      .addStrategy(ycrvStrategy.address, e18.mul(200), e18.mul(200));
-    console.log(
-      'calculateHarvest:',
-      bnToDecimal(
-        await crvStrategyKeep3rJob.callStatic.calculateHarvest(
-          ycrvStrategy.address
-        )
-      )
-    );
+    await crvStrategyKeep3rJob.connect(owner).addStrategy(ycrvStrategy.address, e18.mul(200), e18.mul(200));
+    console.log('calculateHarvest:', bnToDecimal(await crvStrategyKeep3rJob.callStatic.calculateHarvest(ycrvStrategy.address)));
 
-    const workable = await keep3rProxyJob.callStatic.workable(
-      crvStrategyKeep3rJob.address
-    );
+    const workable = await keep3rProxyJob.callStatic.workable(crvStrategyKeep3rJob.address);
     const workData = await crvStrategyKeep3rJob.callStatic.getWorkData();
     console.log({ workable, workData });
-    await keep3rProxyJob
-      .connect(keeper)
-      .work(crvStrategyKeep3rJob.address, workData);
+    await keep3rProxyJob.connect(keeper).work(crvStrategyKeep3rJob.address, workData);
 
     console.log('--');
 
@@ -238,14 +173,7 @@ describe('Keep3rProxyJob', function () {
       await keep3rProxyJob.connect(keeper).work(job, workData);
       console.log('worked!');
     }
-    console.log(
-      'calculateHarvest:',
-      bnToDecimal(
-        await crvStrategyKeep3rJob.callStatic.calculateHarvest(
-          ycrvStrategy.address
-        )
-      )
-    );
+    console.log('calculateHarvest:', bnToDecimal(await crvStrategyKeep3rJob.callStatic.calculateHarvest(ycrvStrategy.address)));
   });
   it.skip('Should deploy new Keep3rProxyJob with keep3r', async function () {
     keep3rProxyJob = await Keep3rProxyJob.deploy(

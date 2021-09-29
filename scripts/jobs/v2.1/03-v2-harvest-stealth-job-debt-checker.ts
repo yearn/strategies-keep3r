@@ -19,12 +19,8 @@ function promptAndSubmit(): Promise<void | Error> {
     const [owner] = await ethers.getSigners();
     console.log('using address:', owner.address);
     try {
-      const harvestV2Keep3rStealthJob = await ethers.getContractAt(
-        'HarvestV2Keep3rStealthJob',
-        contracts.harvestV2Keep3rStealthJob.mainnet
-      );
-      const strategiesAddresses =
-        await harvestV2Keep3rStealthJob.callStatic.strategies();
+      const harvestV2Keep3rStealthJob = await ethers.getContractAt('HarvestV2Keep3rStealthJob', contracts.harvestV2Keep3rStealthJob.mainnet);
+      const strategiesAddresses = await harvestV2Keep3rStealthJob.callStatic.strategies();
 
       const strategies: any = strategiesAddresses.map((address: string) => ({
         address,
@@ -33,25 +29,18 @@ function promptAndSubmit(): Promise<void | Error> {
 
       for (const strategy of strategies) {
         strategy.vault = await strategy.contract.callStatic.vault();
-        strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions['default'],
-          strategy.vault
-        );
+        strategy.vaultContract = await ethers.getContractAt(vaultAPIVersions['default'], strategy.vault);
         strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
         strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions[strategy.vaultAPIVersion as '0.3.0' | '0.3.2'] ||
-            vaultAPIVersions['0.3.2'],
+          vaultAPIVersions[strategy.vaultAPIVersion as '0.3.0' | '0.3.2'] || vaultAPIVersions['0.3.2'],
           strategy.vault
         );
 
-        const params = await strategy.vaultContract.callStatic.strategies(
-          strategy.address
-        );
+        const params = await strategy.vaultContract.callStatic.strategies(strategy.address);
         strategy.lastReport = params.lastReport;
         let debtRatio = params.debtRatio;
         if (debtRatio.eq(0)) {
-          let totalAssets =
-            await strategy.vaultContract.callStatic.totalAssets();
+          let totalAssets = await strategy.vaultContract.callStatic.totalAssets();
           let actualRatio = params.totalDebt.mul(10000).div(totalAssets);
           if (actualRatio.lt(10)) {
             // 0.1% in BPS

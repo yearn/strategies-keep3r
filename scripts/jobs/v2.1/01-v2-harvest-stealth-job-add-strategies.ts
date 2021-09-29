@@ -25,9 +25,7 @@ function promptAndSubmit(): Promise<void | Error> {
         method: 'hardhat_impersonateAccount',
         params: [accounts.yKeeper],
       });
-      const yKeeper: any = ethers.provider.getUncheckedSigner(
-        accounts.yKeeper
-      ) as any as SignerWithAddress;
+      const yKeeper: any = ethers.provider.getUncheckedSigner(accounts.yKeeper) as any as SignerWithAddress;
       yKeeper.address = yKeeper._address;
       signer = yKeeper;
     }
@@ -42,36 +40,25 @@ function promptAndSubmit(): Promise<void | Error> {
             signer
           );
 
-          const jobStrategies =
-            await harvestV2Keep3rStealthJob.callStatic.strategies();
+          const jobStrategies = await harvestV2Keep3rStealthJob.callStatic.strategies();
 
-          const strategiesAdded = v2StealthStrategies
-            .filter((strategy) => strategy.added)
-            .map((strategy) => strategy.address);
+          const strategiesAdded = v2StealthStrategies.filter((strategy) => strategy.added).map((strategy) => strategy.address);
 
-          const strategiesNotYetAdded = v2StealthStrategies
-            .filter((strategy) => !strategy.added)
-            .map((strategy) => strategy.address);
+          const strategiesNotYetAdded = v2StealthStrategies.filter((strategy) => !strategy.added).map((strategy) => strategy.address);
 
           for (const strategyAdded of strategiesAdded) {
             if (jobStrategies.indexOf(strategyAdded) == -1)
-              console.log(
-                `strategy: ${strategyAdded} should be added: false, or removed from config`
-              );
+              console.log(`strategy: ${strategyAdded} should be added: false, or removed from config`);
           }
 
           for (const strategyNotYetAdded of strategiesNotYetAdded) {
             if (jobStrategies.indexOf(strategyNotYetAdded) != -1)
-              console.log(
-                `strategy: ${strategyNotYetAdded} should be added: true, or removed from job and config`
-              );
+              console.log(`strategy: ${strategyNotYetAdded} should be added: true, or removed from job and config`);
           }
 
           for (const jobStrategy of jobStrategies) {
             if (strategiesAdded.indexOf(jobStrategy) == -1)
-              console.log(
-                `strategy: ${jobStrategy} should not be on job, or is missing from config`
-              );
+              console.log(`strategy: ${jobStrategy} should not be on job, or is missing from config`);
           }
 
           const strategiesToAdd = v2StealthStrategies
@@ -103,9 +90,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
           resolve();
         } catch (err) {
-          reject(
-            `Error while deploying v2 keep3r job contracts: ${err.message}`
-          );
+          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
         }
       } else {
         console.error('Aborted!');

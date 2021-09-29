@@ -24,30 +24,15 @@ function promptAndSubmit() {
         if (answer) {
           console.time('OracleBondedKeeper deployed');
           // Setup OracleBondedKeeper
-          console.log(
-            mainnetContracts.keep3r.address,
-            mainnetContracts.keep3rV1Oracle.address
-          );
-          const OracleBondedKeeper = await ethers.getContractFactory(
-            'OracleBondedKeeper'
-          );
-          const oracleBondedKeeper = await OracleBondedKeeper.deploy(
-            mainnetContracts.keep3r.address,
-            mainnetContracts.keep3rV1Oracle.address,
-            {
-              nonce: 886,
-            }
-          );
+          console.log(mainnetContracts.keep3r.address, mainnetContracts.keep3rV1Oracle.address);
+          const OracleBondedKeeper = await ethers.getContractFactory('OracleBondedKeeper');
+          const oracleBondedKeeper = await OracleBondedKeeper.deploy(mainnetContracts.keep3r.address, mainnetContracts.keep3rV1Oracle.address, {
+            nonce: 886,
+          });
 
           console.timeEnd('OracleBondedKeeper deployed');
-          console.log(
-            'OracleBondedKeeper address:',
-            oracleBondedKeeper.address
-          );
-          console.log(
-            'PLEASE: change .config.json & example.config.json oracle.oracleBondedKeeper address to:',
-            oracleBondedKeeper.address
-          );
+          console.log('OracleBondedKeeper address:', oracleBondedKeeper.address);
+          console.log('PLEASE: change .config.json & example.config.json oracle.oracleBondedKeeper address to:', oracleBondedKeeper.address);
           resolve();
         } else {
           console.error('Aborted!');

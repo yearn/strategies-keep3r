@@ -9,9 +9,7 @@ describe('CrvStrategyKeep3rJob', function () {
   // let crvStrategyKeep3r: Contract;
 
   before('Setup accounts and contracts', async () => {
-    crvStrategyKeep3rContract = await ethers.getContractFactory(
-      'CrvStrategyKeep3rJob'
-    );
+    crvStrategyKeep3rContract = await ethers.getContractFactory('CrvStrategyKeep3rJob');
   });
 
   beforeEach(async () => {

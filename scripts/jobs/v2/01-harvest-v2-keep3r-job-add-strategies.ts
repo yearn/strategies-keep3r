@@ -17,10 +17,7 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('adding strategies on HarvestV2Keep3rJob contract');
     try {
       // Setup HarvestV2Keep3rJob
-      const oldHarvestV2Keep3rJob = await ethers.getContractAt(
-        'HarvestV2Keep3rJob',
-        mainnetContracts.oldJobs.harvestV2Keep3rJob
-      );
+      const oldHarvestV2Keep3rJob = await ethers.getContractAt('HarvestV2Keep3rJob', mainnetContracts.oldJobs.harvestV2Keep3rJob);
       // const strategies = [
       //   {
       //     address: '0x979843b8eea56e0bea971445200e0ec3398cdb87',
@@ -53,37 +50,26 @@ function promptAndSubmit(): Promise<void | Error> {
       }));
 
       for (const strategy of strategies) {
-        strategy.requiredAmount = await oldHarvestV2Keep3rJob.requiredAmount(
-          strategy.address
-        );
+        strategy.requiredAmount = await oldHarvestV2Keep3rJob.requiredAmount(strategy.address);
       }
 
-      const harvestV2Keep3rJob = await ethers.getContractAt(
-        'HarvestV2Keep3rJob',
-        mainnetContracts.jobs.harvestV2Keep3rJob
-      );
+      const harvestV2Keep3rJob = await ethers.getContractAt('HarvestV2Keep3rJob', mainnetContracts.jobs.harvestV2Keep3rJob);
 
       console.log(
         strategies.map((strategy: { address: string }) => strategy.address),
-        strategies.map((strategies: { requiredAmount: any }) =>
-          (strategies.requiredAmount as any).toString()
-        )
+        strategies.map((strategies: { requiredAmount: any }) => (strategies.requiredAmount as any).toString())
       );
       if (!(await confirm.run())) return;
 
       // Add harvest strategies
       await harvestV2Keep3rJob.addStrategies(
         strategies.map((strategy: { address: string }) => strategy.address),
-        strategies.map(
-          (strategies: { requiredAmount: any }) => strategies.requiredAmount
-        )
+        strategies.map((strategies: { requiredAmount: any }) => strategies.requiredAmount)
       );
 
       resolve();
     } catch (err) {
-      reject(
-        `Error while adding strategies on HarvestV2Keep3rJob contract: ${err.message}`
-      );
+      reject(`Error while adding strategies on HarvestV2Keep3rJob contract: ${err.message}`);
     }
   });
 }

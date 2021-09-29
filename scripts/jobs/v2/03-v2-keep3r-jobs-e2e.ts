@@ -9,12 +9,8 @@ const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
 async function main() {
   await run('compile');
   const V2Keeper: ContractFactory = await ethers.getContractFactory('V2Keeper');
-  const HarvestV2Keep3rJob: ContractFactory = await ethers.getContractFactory(
-    'HarvestV2Keep3rJob'
-  );
-  const TendV2Keep3rJob: ContractFactory = await ethers.getContractFactory(
-    'TendV2Keep3rJob'
-  );
+  const HarvestV2Keep3rJob: ContractFactory = await ethers.getContractFactory('HarvestV2Keep3rJob');
+  const TendV2Keep3rJob: ContractFactory = await ethers.getContractFactory('TendV2Keep3rJob');
   await promptAndSubmit(V2Keeper, HarvestV2Keep3rJob, TendV2Keep3rJob);
 }
 
@@ -66,15 +62,11 @@ function promptAndSubmit(
       ];
       await harvestV2Keep3rJob.addStrategies(
         v2Strategies.map((v2Strategies) => v2Strategies.address),
-        v2Strategies.map(
-          (v2Strategies) => v2Strategies.harvestAmount || defaultHarvestAmount
-        )
+        v2Strategies.map((v2Strategies) => v2Strategies.harvestAmount || defaultHarvestAmount)
       );
 
       for (const strategy of v2Strategies) {
-        const workable = await harvestV2Keep3rJob.workableStrategy(
-          strategy.address
-        );
+        const workable = await harvestV2Keep3rJob.workableStrategy(strategy.address);
         console.log(strategy.address, 'workable:', workable);
       }
 

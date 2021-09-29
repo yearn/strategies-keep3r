@@ -27,44 +27,28 @@ describe('GenericV2Keep3rJob', function () {
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.keep3rGovernance],
     });
-    const keep3rGovernance = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.keep3rGovernance
-    );
+    const keep3rGovernance = owner.provider.getUncheckedSigner(config.accounts.mainnet.keep3rGovernance);
     // Setup deployer
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.deployer],
     });
-    const deployer = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.deployer
-    );
+    const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     // impersonate keeper
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.keeper],
     });
-    const keeper = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.keeper
-    );
+    const keeper = owner.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
     // impersonate strategist
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: ['0xc3d6880fd95e06c816cb030fac45b3ffe3651cb0'],
     });
-    const strategist = owner.provider.getUncheckedSigner(
-      '0xc3d6880fd95e06c816cb030fac45b3ffe3651cb0'
-    );
+    const strategist = owner.provider.getUncheckedSigner('0xc3d6880fd95e06c816cb030fac45b3ffe3651cb0');
 
-    const keep3r = await ethers.getContractAt(
-      'IKeep3rV1',
-      escrowContracts.keep3r,
-      keep3rGovernance
-    );
-    keep3rSugarMommy = await ethers.getContractAt(
-      'Keep3rSugarMommy',
-      escrowContracts.sugarMommy,
-      deployer
-    );
+    const keep3r = await ethers.getContractAt('IKeep3rV1', escrowContracts.keep3r, keep3rGovernance);
+    keep3rSugarMommy = await ethers.getContractAt('Keep3rSugarMommy', escrowContracts.sugarMommy, deployer);
 
     genericV2Keep3rJob = (
       await GenericV2Keep3rJob.deploy(
@@ -121,24 +105,14 @@ describe('GenericV2Keep3rJob', function () {
 
     // set keeper to genericV2Keep3rJob on strategies
     for (const strategy of strategies) {
-      strategy.contract = await ethers.getContractAt(
-        'IBaseStrategy',
-        strategy.address,
-        strategist
-      );
+      strategy.contract = await ethers.getContractAt('IBaseStrategy', strategy.address, strategist);
       await strategy.contract.setKeeper(genericV2Keep3rJob.address);
     }
 
     await keep3rSugarMommy.addValidJob(genericV2Keep3rJob.address);
 
-    console.log(
-      'maxCredits:',
-      e18ToDecimal(await genericV2Keep3rJob.maxCredits())
-    );
-    console.log(
-      'usedCredits:',
-      e18ToDecimal(await genericV2Keep3rJob.usedCredits())
-    );
+    console.log('maxCredits:', e18ToDecimal(await genericV2Keep3rJob.maxCredits()));
+    console.log('usedCredits:', e18ToDecimal(await genericV2Keep3rJob.usedCredits()));
 
     const remoteStrategies = await genericV2Keep3rJob.strategies();
     expect(strategies.map((s) => s.address)).to.be.deep.eq(remoteStrategies);
@@ -146,9 +120,7 @@ describe('GenericV2Keep3rJob', function () {
     for (const strategy of strategies) {
       console.log(strategy.name);
       if (strategy.harvest > 0) {
-        strategy.harvestable = await genericV2Keep3rJob.harvestable(
-          strategy.address
-        );
+        strategy.harvestable = await genericV2Keep3rJob.harvestable(strategy.address);
         console.log('harvestable:', strategy.harvestable);
       }
       if (strategy.tend > 0) {
@@ -161,26 +133,17 @@ describe('GenericV2Keep3rJob', function () {
       if (strategy.harvestable) {
         console.log('harvesting:', strategy.name);
         await genericV2Keep3rJob.harvest(strategy.address);
-        await expect(
-          genericV2Keep3rJob.harvestable(strategy.address)
-        ).to.be.revertedWith(
+        await expect(genericV2Keep3rJob.harvestable(strategy.address)).to.be.revertedWith(
           'generic-keep3r-v2::harvestable:strategy-harvest-cooldown'
         );
       }
       if (strategy.tendable) {
         console.log('tending:', strategy.name);
         strategy.tendable = await genericV2Keep3rJob.tendable(strategy.address);
-        await expect(
-          genericV2Keep3rJob.tendable(strategy.address)
-        ).to.be.revertedWith(
-          'generic-keep3r-v2::tendable:strategy-tend-cooldown'
-        );
+        await expect(genericV2Keep3rJob.tendable(strategy.address)).to.be.revertedWith('generic-keep3r-v2::tendable:strategy-tend-cooldown');
       }
     }
 
-    console.log(
-      'usedCredits:',
-      e18ToDecimal(await genericV2Keep3rJob.usedCredits())
-    );
+    console.log('usedCredits:', e18ToDecimal(await genericV2Keep3rJob.usedCredits()));
   });
 });

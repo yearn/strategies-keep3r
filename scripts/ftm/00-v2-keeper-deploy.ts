@@ -25,15 +25,10 @@ function promptAndSubmit() {
         deployer = (owner.provider as any).getUncheckedSigner(accounts.yKeeper);
       }
 
-      const V2Keeper: ContractFactory = await ethers.getContractFactory(
-        'V2Keeper'
-      );
+      const V2Keeper: ContractFactory = await ethers.getContractFactory('V2Keeper');
       const v2Keeper = await V2Keeper.deploy(contracts.mechanicsRegistry.ftm);
       console.log('V2Keeper address:', v2Keeper.address);
-      console.log(
-        'PLEASE: change .contracts.ts v2Keeper.ftm address to:',
-        v2Keeper.address
-      );
+      console.log('PLEASE: change .contracts.ts v2Keeper.ftm address to:', v2Keeper.address);
 
       resolve();
     } catch (err) {

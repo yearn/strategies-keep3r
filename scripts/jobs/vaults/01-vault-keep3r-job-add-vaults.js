@@ -1,11 +1,6 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const {
-  bn,
-  e18,
-  e18ToDecimal,
-  ZERO_ADDRESS,
-} = require('../../../utils/web3-utils');
+const { bn, e18, e18ToDecimal, ZERO_ADDRESS } = require('../../../utils/web3-utils');
 const { v1Vaults } = require('../../../utils/v1-vaults');
 const config = require('../../../.config.json');
 const mainnetContracts = config.contracts.mainnet;
@@ -33,16 +28,10 @@ function run() {
         method: 'hardhat_impersonateAccount',
         params: [config.accounts.mainnet.deployer],
       });
-      deployer = owner.provider.getUncheckedSigner(
-        config.accounts.mainnet.deployer
-      );
+      deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     }
 
-    const vaultKeep3rJob = await ethers.getContractAt(
-      'VaultKeep3rJob',
-      mainnetContracts.jobs.vaultKeep3rJob,
-      deployer
-    );
+    const vaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', mainnetContracts.jobs.vaultKeep3rJob, deployer);
 
     // Checks if local data matches chain data
     const addedVaults = await vaultKeep3rJob.vaults();
@@ -51,10 +40,8 @@ function run() {
       if (added && vault.added) continue;
       if (!added && !vault.added) continue;
       console.log(vault.name, vault.address);
-      if (!added && vault.added)
-        throw new Error('vault set as added but not on job');
-      if (added && !vault.added)
-        throw new Error('vault set as not-added but added on job');
+      if (!added && vault.added) throw new Error('vault set as added but not on job');
+      if (added && !vault.added) throw new Error('vault set as not-added but added on job');
     }
 
     const newV1Vaults = v1Vaults.filter((vault) => !vault.added);
@@ -68,9 +55,7 @@ function run() {
     console.time('addVaults');
     await vaultKeep3rJob.addVaults(
       newV1Vaults.map((vault) => vault.address),
-      newV1Vaults.map((vault) =>
-        bn.from(10).pow(vault.decimals).mul(vault.requiredEarn)
-      ),
+      newV1Vaults.map((vault) => bn.from(10).pow(vault.decimals).mul(vault.requiredEarn)),
       { nonce: 1086 }
     );
     console.timeEnd('addVaults');

@@ -22,27 +22,14 @@ function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     const provider = ethers.getDefaultProvider();
-    const signer = new ethers.Wallet(
-      '0x' + config.accounts.mainnet.privateKey
-    ).connect(provider);
+    const signer = new ethers.Wallet('0x' + config.accounts.mainnet.privateKey).connect(provider);
     console.log('working v2 harvest strategies as:', signer.address);
-    const v2Keeper = await ethers.getContractAt(
-      'V2Keeper',
-      contracts.mainnet.proxyJobs.v2Keeper,
-      signer
-    );
-    const harvestV2Keep3rJob = await ethers.getContractAt(
-      'V2Keep3rJob',
-      contracts.mainnet.oldJobs.harvestV2Keep3rJob
-    );
-    let strategiesAddresses: string[] =
-      await harvestV2Keep3rJob.callStatic.strategies();
+    const v2Keeper = await ethers.getContractAt('V2Keeper', contracts.mainnet.proxyJobs.v2Keeper, signer);
+    const harvestV2Keep3rJob = await ethers.getContractAt('V2Keep3rJob', contracts.mainnet.oldJobs.harvestV2Keep3rJob);
+    let strategiesAddresses: string[] = await harvestV2Keep3rJob.callStatic.strategies();
 
     // manually add extra strategies
-    strategiesAddresses = [
-      ...strategiesAddresses,
-      '0xe9bD008A97e362F7C501F6F5532A348d2e6B8131',
-    ];
+    strategiesAddresses = [...strategiesAddresses, '0xe9bD008A97e362F7C501F6F5532A348d2e6B8131'];
 
     const baseStrategies: any = strategiesAddresses.map((address: string) => ({
       address,
@@ -78,18 +65,13 @@ function promptAndSubmit(): Promise<void | Error> {
       const now = bn.from(Math.round(new Date().valueOf() / 1000));
 
       for (const strategy of strategies) {
-        if (strategy.name)
-          console.log('strategy', strategy.name, strategy.address);
+        if (strategy.name) console.log('strategy', strategy.name, strategy.address);
         else console.log('strategy', strategy.address);
         if (strategiesToAvoid.indexOf(strategy.address) != -1) {
           console.log('avoiding...');
           continue;
         }
-        strategy.contract = await ethers.getContractAt(
-          'IBaseStrategy',
-          strategy.address,
-          signer
-        );
+        strategy.contract = await ethers.getContractAt('IBaseStrategy', strategy.address, signer);
         try {
           strategy.isCRV = !!(await strategy.contract.callStatic.crv());
         } catch (error) {}
@@ -97,26 +79,18 @@ function promptAndSubmit(): Promise<void | Error> {
           ? bn.from(Math.round(strategy.maxReportDelay))
           : await strategy.contract.callStatic.maxReportDelay();
         strategy.vault = await strategy.contract.callStatic.vault();
-        strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions['default'],
-          strategy.vault,
-          strategy.keeperAccount
-        );
+        strategy.vaultContract = await ethers.getContractAt(vaultAPIVersions['default'], strategy.vault, strategy.keeperAccount);
         strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
         strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions[strategy.vaultAPIVersion as '0.3.0' | '0.3.2'] ||
-            vaultAPIVersions['0.3.2'],
+          vaultAPIVersions[strategy.vaultAPIVersion as '0.3.0' | '0.3.2'] || vaultAPIVersions['0.3.2'],
           strategy.vault,
           strategy.keeperAccount
         );
-        const params = await strategy.vaultContract.callStatic.strategies(
-          strategy.address
-        );
+        const params = await strategy.vaultContract.callStatic.strategies(strategy.address);
         strategy.lastReport = params.lastReport;
         let debtRatio = params.debtRatio;
         if (debtRatio.eq(0)) {
-          let totalAssets =
-            await strategy.vaultContract.callStatic.totalAssets();
+          let totalAssets = await strategy.vaultContract.callStatic.totalAssets();
           let actualRatio = params.totalDebt.mul(10000).div(totalAssets);
           if (actualRatio.lt(10)) {
             // 0.1% in BPS
@@ -124,13 +98,8 @@ function promptAndSubmit(): Promise<void | Error> {
             continue; // Ignore strategies which have no debtRatio AND no actualRatio
           }
         }
-        const cooldownCompleted = strategy.lastReport.lt(
-          now.sub(strategy.maxReportDelay)
-        );
-        console.log(
-          'maxReportDelay hrs:',
-          strategy.maxReportDelay.div(60 * 60).toNumber()
-        );
+        const cooldownCompleted = strategy.lastReport.lt(now.sub(strategy.maxReportDelay));
+        console.log('maxReportDelay hrs:', strategy.maxReportDelay.div(60 * 60).toNumber());
         console.log(
           'strategy over cooldown:',
           cooldownCompleted,
@@ -146,26 +115,16 @@ function promptAndSubmit(): Promise<void | Error> {
         if (!cooldownCompleted) {
           console.log('checking creditAvailable:');
           // vault.creditAvailable(strategy) >= amount -> do a harvest if true.
-          const creditAvailable =
-            await strategy.vaultContract.callStatic.creditAvailable(
-              strategy.address
-            );
+          const creditAvailable = await strategy.vaultContract.callStatic.creditAvailable(strategy.address);
           // if creditAvailable is less than amount, do not harvest;
-          console.log(
-            'amount:',
-            strategy.amount.toString(),
-            'creditAvailable:',
-            creditAvailable.toString()
-          );
+          console.log('amount:', strategy.amount.toString(), 'creditAvailable:', creditAvailable.toString());
           if (creditAvailable.lt(strategy.amount)) continue;
         }
 
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
 
-        const gasLimit = await provider.estimateGas(
-          await v2Keeper.populateTransaction.harvest(strategy.address)
-        );
+        const gasLimit = await provider.estimateGas(await v2Keeper.populateTransaction.harvest(strategy.address));
         console.log('gasLimit', gasLimit.toNumber());
 
         await v2Keeper.callStatic.harvest(strategy.address, {
@@ -194,20 +153,15 @@ function promptAndSubmit(): Promise<void | Error> {
           reject(`gas price > ${maxGwei}gwei`);
         }
 
-        const nonce = ethers.BigNumber.from(
-          await signer.getTransactionCount()
-        ).add(nonceIncreasedBy);
+        const nonce = ethers.BigNumber.from(await signer.getTransactionCount()).add(nonceIncreasedBy);
         console.log('using account nonce:', nonce.toNumber());
         nonceIncreasedBy = nonceIncreasedBy.add(1);
 
-        const rawMessage = await v2Keeper.populateTransaction.harvest(
-          strategy.address,
-          {
-            gasPrice,
-            nonce,
-            gasLimit: gasLimit.mul(11).div(10), // 10% buffer
-          }
-        );
+        const rawMessage = await v2Keeper.populateTransaction.harvest(strategy.address, {
+          gasPrice,
+          nonce,
+          gasLimit: gasLimit.mul(11).div(10), // 10% buffer
+        });
         console.log(rawMessage);
 
         const signedMessage = await signer.signTransaction(rawMessage);

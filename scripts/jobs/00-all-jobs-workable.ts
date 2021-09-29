@@ -27,10 +27,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
 async function v2Harvest() {
   // Setup HarvestV2Keep3rJob
-  const HarvestV2Keep3rJob = await ethers.getContractAt(
-    'HarvestV2Keep3rJob',
-    mainnetContracts.oldJobs.harvestV2Keep3rJob
-  );
+  const HarvestV2Keep3rJob = await ethers.getContractAt('HarvestV2Keep3rJob', mainnetContracts.oldJobs.harvestV2Keep3rJob);
   console.log('HarvestV2Keep3rJob:', HarvestV2Keep3rJob.address);
 
   // New job: HarvestV2Keep3rJob https://etherscan.io/address/0x620bd1E1D1d845c8904aC03F6cd6b87706B7596b#code
@@ -54,10 +51,7 @@ async function v2Harvest() {
 }
 
 async function crvHarvest() {
-  const CrvStrategyKeep3rJob = await ethers.getContractAt(
-    'CrvStrategyKeep3rJob',
-    mainnetContracts.jobs.crvStrategyKeep3rJob
-  );
+  const CrvStrategyKeep3rJob = await ethers.getContractAt('CrvStrategyKeep3rJob', mainnetContracts.jobs.crvStrategyKeep3rJob);
   console.log('CrvStrategyKeep3rJob:', CrvStrategyKeep3rJob.address);
 
   // New job: CrvStrategyKeep3rJob https://etherscan.io/address/0x02027bDA2425204f152B8aa35Fb78687D65E1AF5#code
@@ -81,10 +75,7 @@ async function crvHarvest() {
 }
 
 async function vaultEarn() {
-  const VaultKeep3rJob = await ethers.getContractAt(
-    'VaultKeep3rJob',
-    mainnetContracts.jobs.vaultKeep3rJob
-  );
+  const VaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', mainnetContracts.jobs.vaultKeep3rJob);
   console.log('VaultKeep3rJob:', VaultKeep3rJob.address);
 
   // New job: VaultKeep3rJob https://etherscan.io/address/0x4a479E4457841D2D2Ff86e5A5389300963880C10#code

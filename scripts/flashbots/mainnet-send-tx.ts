@@ -14,8 +14,7 @@ import { makeid } from '../../utils/hash';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({
-  message:
-    'Do you wish to stealth work harvest job though flashbots on mainnet?',
+  message: 'Do you wish to stealth work harvest job though flashbots on mainnet?',
 });
 
 async function main() {
@@ -31,30 +30,19 @@ function mainExecute(): Promise<void | Error> {
     console.log('using address:', owner.address);
 
     const network = await ethers.provider.getNetwork();
-    if (network.chainId != 1)
-      return reject('not on mainnet network. please use --network mainnet');
+    if (network.chainId != 1) return reject('not on mainnet network. please use --network mainnet');
     const provider = ethers.provider;
 
-    const stealthRelayer = await ethers.getContractAt(
-      'IStealthRelayer',
-      contracts.stealthRelayer.mainnet
-    );
-    const harvestV2Keep3rStealthJob = await ethers.getContractAt(
-      'HarvestV2Keep3rStealthJob',
-      contracts.harvestV2Keep3rStealthJob.mainnet
-    );
+    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet);
+    const harvestV2Keep3rStealthJob = await ethers.getContractAt('HarvestV2Keep3rStealthJob', contracts.harvestV2Keep3rStealthJob.mainnet);
     console.log('creating signer');
-    const signer = new ethers.Wallet(
-      process.env.MAINNET_PRIVATE_KEY as string
-    ).connect(provider);
+    const signer = new ethers.Wallet(process.env.MAINNET_PRIVATE_KEY as string).connect(provider);
 
     // `authSigner` is an Ethereum private key that does NOT store funds and is NOT your bot's primary key.
     // This is an identifying key for signing payloads to establish reputation and whitelisting
     // In production, this should be used across multiple bundles to build relationship. In this example, we generate a new wallet each time
     console.log('creating flashbotSigner');
-    const flashbotSigner = new ethers.Wallet(
-      process.env.FLASHBOTS_PRIVATE_KEY as string
-    ).connect(provider);
+    const flashbotSigner = new ethers.Wallet(process.env.FLASHBOTS_PRIVATE_KEY as string).connect(provider);
 
     // Flashbots provider requires passing in a standard provider
     console.log('creating flashbotsProvider');
@@ -65,14 +53,9 @@ function mainExecute(): Promise<void | Error> {
 
     // build work tx
     const strategy = '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16';
-    const workTx = await harvestV2Keep3rStealthJob.populateTransaction.work(
-      strategy
-    );
+    const workTx = await harvestV2Keep3rStealthJob.populateTransaction.work(strategy);
 
-    const stealthHash = ethers.utils.solidityKeccak256(
-      ['string'],
-      [makeid(32)]
-    );
+    const stealthHash = ethers.utils.solidityKeccak256(['string'], [makeid(32)]);
     console.log('stealthHash');
     console.log(stealthHash);
     const blockNumber = await ethers.provider.getBlockNumber();
@@ -81,10 +64,7 @@ function mainExecute(): Promise<void | Error> {
     // NOTE: get this dynamically though estimated gas used + average fast gas price (check simulation)
     // const coinbasePayment = utils.parseEther('1').div(100);
 
-    const pendingBlock = await ethers.provider.send('eth_getBlockByNumber', [
-      'latest',
-      false,
-    ]);
+    const pendingBlock = await ethers.provider.send('eth_getBlockByNumber', ['latest', false]);
     const blockGasLimit = BigNumber.from(pendingBlock.gasLimit);
 
     // get fast gas price
@@ -133,16 +113,10 @@ function mainExecute(): Promise<void | Error> {
     const signedBundle = await flashbotsProvider.signBundle(bundle);
     let simulation: SimulationResponse;
     try {
-      simulation = await flashbotsProvider.simulate(
-        signedBundle,
-        targetBlockNumber
-      );
+      simulation = await flashbotsProvider.simulate(signedBundle, targetBlockNumber);
     } catch (error) {
       if ('body' in error && 'message' in JSON.parse(error.body).error) {
-        console.log(
-          '[Simulation Error] Message:',
-          JSON.parse(error.body).error.message
-        );
+        console.log('[Simulation Error] Message:', JSON.parse(error.body).error.message);
       } else {
         console.log(error);
       }
@@ -183,28 +157,23 @@ function mainExecute(): Promise<void | Error> {
     console.log(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`);
 
     // send bundle
-    const flashbotsTransactionResponse: FlashbotsTransaction =
-      await flashbotsProvider.sendBundle(
-        [
-          {
-            signedTransaction: await signer.signTransaction(executeTxRepriced),
-          },
-        ],
-        targetBlockNumber
-      );
+    const flashbotsTransactionResponse: FlashbotsTransaction = await flashbotsProvider.sendBundle(
+      [
+        {
+          signedTransaction: await signer.signTransaction(executeTxRepriced),
+        },
+      ],
+      targetBlockNumber
+    );
 
-    const resolution = await (
-      flashbotsTransactionResponse as FlashbotsTransactionResponse
-    ).wait();
+    const resolution = await (flashbotsTransactionResponse as FlashbotsTransactionResponse).wait();
 
     if (resolution == FlashbotsBundleResolution.BundleIncluded) {
       console.log('BundleIncluded, sucess!');
       return resolve();
     }
     if (resolution == FlashbotsBundleResolution.BlockPassedWithoutInclusion) {
-      console.log(
-        'BlockPassedWithoutInclusion, re-build and re-send bundle...'
-      );
+      console.log('BlockPassedWithoutInclusion, re-build and re-send bundle...');
       return await mainExecute();
     }
     if (resolution == FlashbotsBundleResolution.AccountNonceTooHigh) {

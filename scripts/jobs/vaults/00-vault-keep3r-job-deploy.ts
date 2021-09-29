@@ -10,15 +10,11 @@ const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
 
 async function main() {
   await run('compile');
-  const VaultKeep3rJob: ContractFactory = await ethers.getContractFactory(
-    'VaultKeep3rJob'
-  );
+  const VaultKeep3rJob: ContractFactory = await ethers.getContractFactory('VaultKeep3rJob');
   await promptAndSubmit(VaultKeep3rJob);
 }
 
-function promptAndSubmit(
-  VaultKeep3rJob: ContractFactory
-): Promise<void | Error> {
+function promptAndSubmit(VaultKeep3rJob: ContractFactory): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     console.log('using address:', owner.address);
@@ -50,10 +46,7 @@ function promptAndSubmit(
           );
           console.timeEnd('VaultKeep3rJob deployed');
           console.log('VaultKeep3rJob address:', vaultKeep3rJob.address);
-          console.log(
-            'PLEASE: change .config.json & example.config.json proxyJobs.vaultKeep3rJob address to:',
-            vaultKeep3rJob.address
-          );
+          console.log('PLEASE: change .config.json & example.config.json proxyJobs.vaultKeep3rJob address to:', vaultKeep3rJob.address);
           resolve();
         } catch (err) {
           reject(`Error while deploying crv keep3r contract: ${err.message}`);

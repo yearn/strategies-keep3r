@@ -10,15 +10,11 @@ const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
 
 async function main() {
   await run('compile');
-  const CrvStrategyKeep3rJob: ContractFactory = await ethers.getContractFactory(
-    'CrvStrategyKeep3rJob'
-  );
+  const CrvStrategyKeep3rJob: ContractFactory = await ethers.getContractFactory('CrvStrategyKeep3rJob');
   await promptAndSubmit(CrvStrategyKeep3rJob);
 }
 
-function promptAndSubmit(
-  CrvStrategyKeep3rJob: ContractFactory
-): Promise<void | Error> {
+function promptAndSubmit(CrvStrategyKeep3rJob: ContractFactory): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     console.log('using address:', owner.address);
@@ -49,10 +45,7 @@ function promptAndSubmit(
             30 * 60 // 30 minutes harvestCooldown
           );
           console.timeEnd('CrvStrategyKeep3rJob deployed');
-          console.log(
-            'CrvStrategyKeep3rJob address:',
-            crvStrategyKeep3rJob.address
-          );
+          console.log('CrvStrategyKeep3rJob address:', crvStrategyKeep3rJob.address);
           console.log(
             'PLEASE: change .config.json & example.config.json proxyJobs.crvStrategyKeep3rJob address to:',
             crvStrategyKeep3rJob.address

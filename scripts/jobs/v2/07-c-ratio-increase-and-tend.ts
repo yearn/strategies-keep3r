@@ -23,17 +23,13 @@ function promptAndSubmit(): Promise<void | Error> {
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.deployer],
     });
-    const signer = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.deployer
-    );
+    const signer = ethers.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     console.log('bump c-ratio on tend strategies as:', signer._address);
     await network.provider.request({
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.publicKey],
     });
-    const multisig = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.publicKey
-    );
+    const multisig = ethers.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
     try {
       const gasResponse = await taichi.getGasPrice();
       console.log('taichi gasPrices:', {
@@ -44,16 +40,8 @@ function promptAndSubmit(): Promise<void | Error> {
       const gasPrice = ethers.BigNumber.from(gasResponse.data.fast);
       const gasPriceDemo = ethers.BigNumber.from(1);
 
-      const TendV2Keep3rJob = await ethers.getContractAt(
-        'TendV2Keep3rJob',
-        '0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3',
-        signer
-      );
-      const V2Keeper = await ethers.getContractAt(
-        'V2Keeper',
-        '0x736D7e3c5a6CB2CE3B764300140ABF476F6CFCCF',
-        signer
-      );
+      const TendV2Keep3rJob = await ethers.getContractAt('TendV2Keep3rJob', '0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3', signer);
+      const V2Keeper = await ethers.getContractAt('V2Keeper', '0x736D7e3c5a6CB2CE3B764300140ABF476F6CFCCF', signer);
 
       // const newFixedStrat = '0x0E5397B8547C128Ee20958286436b7BC3f9faAa4';
       const newFixedStrat = '0x4730D10703155Ef4a448B17b0eaf3468fD4fb02d';
@@ -61,32 +49,18 @@ function promptAndSubmit(): Promise<void | Error> {
       // const newFixedStrat = '0x1A5890d45090701A35D995Be3b63948A67460341';
 
       const strategy: any = { address: newFixedStrat };
-      strategy.contract = await ethers.getContractAt(
-        'IBaseStrategy',
-        strategy.address,
-        signer
-      );
+      strategy.contract = await ethers.getContractAt('IBaseStrategy', strategy.address, signer);
       strategy.vault = await strategy.contract.callStatic.vault();
       strategy.want = await strategy.contract.callStatic.want();
       strategy.name = await strategy.contract.callStatic.name();
-      strategy.wantContract = await ethers.getContractAt(
-        'ERC20Mock',
-        strategy.want,
-        strategy.keeperAccount
-      );
+      strategy.wantContract = await ethers.getContractAt('ERC20Mock', strategy.want, strategy.keeperAccount);
       strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
-      strategy.wantBalancePre =
-        await strategy.wantContract.callStatic.balanceOf(strategy.address);
+      strategy.wantBalancePre = await strategy.wantContract.callStatic.balanceOf(strategy.address);
       strategy.decimals = await strategy.wantContract.callStatic.decimals();
       // init default
-      strategy.vaultContract = await ethers.getContractAt(
-        vaultAPIVersions['0.3.2'],
-        strategy.vault,
-        strategy.keeperAccount
-      );
+      strategy.vaultContract = await ethers.getContractAt(vaultAPIVersions['0.3.2'], strategy.vault, strategy.keeperAccount);
 
-      strategy.vaultTotalAssets =
-        await strategy.vaultContract.callStatic.totalAssets();
+      strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
       const workable = await strategy.contract.callStatic.tendTrigger(5000);
       console.log({
         strategy: strategy.address,
@@ -97,9 +71,7 @@ function promptAndSubmit(): Promise<void | Error> {
       const prePPS = await strategy.vaultContract.callStatic.pricePerShare();
 
       console.log('set c_ratio to 28000');
-      await strategy.contract
-        .connect(multisig)
-        .setBorrowCollateralizationRatio(28000);
+      await strategy.contract.connect(multisig).setBorrowCollateralizationRatio(28000);
 
       console.log('tend');
       await V2Keeper.tend(strategy.address);
@@ -110,14 +82,7 @@ function promptAndSubmit(): Promise<void | Error> {
       console.log('get vault pps');
       const postPPS = await strategy.vaultContract.callStatic.pricePerShare();
 
-      console.log(
-        'pre pps:',
-        prePPS.toString(),
-        'post pps:',
-        postPPS.toString(),
-        'diff:',
-        postPPS.sub(prePPS).toString()
-      );
+      console.log('pre pps:', prePPS.toString(), 'post pps:', postPPS.toString(), 'diff:', postPPS.sub(prePPS).toString());
     } catch (err) {
       reject(`bump c-ratio on tend strategies: ${err.message}`);
     }

@@ -18,9 +18,7 @@ function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     const provider = ethers.getDefaultProvider();
-    const signer = new ethers.Wallet(
-      '0x' + config.accounts.mainnet.privateKey
-    ).connect(provider);
+    const signer = new ethers.Wallet('0x' + config.accounts.mainnet.privateKey).connect(provider);
     console.log('working v2 tend strategies as:', signer.address);
     try {
       const gasResponse = await taichi.getGasPrice();
@@ -32,20 +30,14 @@ function promptAndSubmit(): Promise<void | Error> {
       const gasPrice = ethers.BigNumber.from(gasResponse.data.fast);
       const gasPriceDemo = ethers.BigNumber.from(1);
 
-      const TendV2Keep3rJob = await ethers.getContractAt(
-        'TendV2Keep3rJob',
-        '0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3',
-        signer
-      );
+      const TendV2Keep3rJob = await ethers.getContractAt('TendV2Keep3rJob', '0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3', signer);
       const newFixedStrat = '0x1A5890d45090701A35D995Be3b63948A67460341';
 
       const strategies = await TendV2Keep3rJob.callStatic.strategies();
 
       for (const strategyAddress of [...strategies, newFixedStrat]) {
         const strategy: any = { address: strategyAddress };
-        const workable = await TendV2Keep3rJob.callStatic.workable(
-          strategy.address
-        );
+        const workable = await TendV2Keep3rJob.callStatic.workable(strategy.address);
         console.log({ strategy: strategy.address, workable });
         if (!workable) continue;
         try {

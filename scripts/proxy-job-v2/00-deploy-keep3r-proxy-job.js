@@ -47,10 +47,7 @@ function promptAndSubmit(Keep3rProxyJobV2) {
           );
           console.timeEnd('Keep3rProxyJobV2 deployed');
           console.log('Keep3rProxyJobV2 address:', keep3rProxyJobV2.address);
-          console.log(
-            'PLEASE: change .config.json & example.config.json proxyJobV2 address to:',
-            keep3rProxyJobV2.address
-          );
+          console.log('PLEASE: change .config.json & example.config.json proxyJobV2 address to:', keep3rProxyJobV2.address);
           resolve();
         } else {
           console.error('Aborted!');

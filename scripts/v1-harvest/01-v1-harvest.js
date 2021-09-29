@@ -29,9 +29,7 @@ function promptAndSubmit() {
               method: 'hardhat_impersonateAccount',
               params: [config.accounts.mainnet.deployer],
             });
-            deployer = owner.provider.getUncheckedSigner(
-              config.accounts.mainnet.deployer
-            );
+            deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
           }
 
           let vaults;
@@ -40,10 +38,7 @@ function promptAndSubmit() {
             vaults = registryData;
           } else {
             console.log('using on-chain v1 registry');
-            const v1registry = await ethers.getContractAt(
-              'IV1Registry',
-              config.contracts.mainnet.v1registry.address
-            );
+            const v1registry = await ethers.getContractAt('IV1Registry', config.contracts.mainnet.v1registry.address);
             const vaultsAddresses = await v1registry.callStatic.getVaults();
             const vaultsInfo = await v1registry.callStatic.getVaultsInfo();
             vaults = vaultsAddresses.map((vaultAddress, i) => ({
@@ -57,18 +52,9 @@ function promptAndSubmit() {
           }
 
           for (const vault of vaults) {
-            vault.contract = await ethers.getContractAt(
-              'IV1Vault',
-              vault.address
-            );
-            vault.strategyContract = await ethers.getContractAt(
-              'IV1Strategy',
-              vault.strategy
-            );
-            vault.tokenContract = await ethers.getContractAt(
-              'ERC20Mock',
-              vault.token
-            );
+            vault.contract = await ethers.getContractAt('IV1Vault', vault.address);
+            vault.strategyContract = await ethers.getContractAt('IV1Strategy', vault.strategy);
+            vault.tokenContract = await ethers.getContractAt('ERC20Mock', vault.token);
             vault.decimals = await vault.tokenContract.callStatic.decimals();
             vault.name = await vault.contract.callStatic.name();
             vault.symbol = await vault.contract.callStatic.symbol();
@@ -76,10 +62,7 @@ function promptAndSubmit() {
               vault.keeper = await vault.strategyContract.callStatic.keeper();
             } catch (error) {}
             vault.want = await vault.strategyContract.callStatic.want();
-            vault.wantContract = await ethers.getContractAt(
-              'ERC20Mock',
-              vault.want
-            );
+            vault.wantContract = await ethers.getContractAt('ERC20Mock', vault.want);
             vault.wantSymbol = await vault.wantContract.callStatic.symbol();
           }
 
@@ -88,32 +71,14 @@ function promptAndSubmit() {
             try {
               vault.voter = await vault.strategyContract.callStatic.voter();
               vault.gauge = await vault.strategyContract.callStatic.gauge();
-              vault.gaugeContract = await ethers.getContractAt(
-                'ICrvClaimable',
-                vault.gauge
-              );
-              vault.claimableTokens =
-                await vault.gaugeContract.callStatic.claimable_tokens(
-                  vault.voter
-                );
+              vault.gaugeContract = await ethers.getContractAt('ICrvClaimable', vault.gauge);
+              vault.claimableTokens = await vault.gaugeContract.callStatic.claimable_tokens(vault.voter);
               vault.checkHarvest = true;
               if (vault.claimableTokens > vault.decimals.mul(9_000)) {
                 console.log();
-                console.log(
-                  vault.name,
-                  vault.address,
-                  vault.strategy,
-                  'want:',
-                  vault.wantSymbol
-                );
-                console.log(
-                  'claimable:',
-                  bnToDecimal(vault.claimableTokens, vault.decimals),
-                  'crv'
-                );
-                console.log(
-                  `harvest with ${vault.keeper} on: https://etherscan.io/address/${vault.strategy}#writeContract`
-                );
+                console.log(vault.name, vault.address, vault.strategy, 'want:', vault.wantSymbol);
+                console.log('claimable:', bnToDecimal(vault.claimableTokens, vault.decimals), 'crv');
+                console.log(`harvest with ${vault.keeper} on: https://etherscan.io/address/${vault.strategy}#writeContract`);
                 console.log();
               }
             } catch (error) {}
@@ -121,12 +86,7 @@ function promptAndSubmit() {
 
           for (const vault of vaults) {
             if (!vault.checkHarvest) {
-              console.log(
-                vault.strategy,
-                vault.symbol,
-                vault.wantSymbol,
-                'harvest not checked'
-              );
+              console.log(vault.strategy, vault.symbol, vault.wantSymbol, 'harvest not checked');
             }
           }
 
@@ -164,13 +124,7 @@ function logVaultData(strategy, params) {
     'debtRatio:',
     params.debtRatio.toNumber(),
     'availableDebt:',
-    bnToDecimal(
-      strategy.vaultTotalAssets
-        .sub(params.totalDebt)
-        .mul(10_000)
-        .div(params.debtRatio),
-      strategy.decimals
-    )
+    bnToDecimal(strategy.vaultTotalAssets.sub(params.totalDebt).mul(10_000).div(params.debtRatio), strategy.decimals)
   );
 }
 function logParams(strategy, params) {

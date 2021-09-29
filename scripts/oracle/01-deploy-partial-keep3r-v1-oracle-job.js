@@ -33,25 +33,19 @@ function promptAndSubmit() {
             false, // only EOA disabled
             mainnetContracts.oracle.oracleBondedKeeper
           );
-          const PartialKeep3rV1OracleJob = await ethers.getContractFactory(
-            'PartialKeep3rV1OracleJob'
+          const PartialKeep3rV1OracleJob = await ethers.getContractFactory('PartialKeep3rV1OracleJob');
+          const partialKeep3rV1OracleJob = await PartialKeep3rV1OracleJob.deploy(
+            mainnetContracts.keep3r.address,
+            ZERO_ADDRESS,
+            e18.mul(200), // 200 KP3R required
+            0,
+            0,
+            false, // only EOA disabled
+            mainnetContracts.oracle.oracleBondedKeeper,
+            { nonce: 887 }
           );
-          const partialKeep3rV1OracleJob =
-            await PartialKeep3rV1OracleJob.deploy(
-              mainnetContracts.keep3r.address,
-              ZERO_ADDRESS,
-              e18.mul(200), // 200 KP3R required
-              0,
-              0,
-              false, // only EOA disabled
-              mainnetContracts.oracle.oracleBondedKeeper,
-              { nonce: 887 }
-            );
           console.timeEnd('PartialKeep3rV1OracleJob deployed');
-          console.log(
-            'PartialKeep3rV1OracleJob address:',
-            partialKeep3rV1OracleJob.address
-          );
+          console.log('PartialKeep3rV1OracleJob address:', partialKeep3rV1OracleJob.address);
           console.log(
             'PLEASE: change .config.json & example.config.json oracle.partialKeep3rV1OracleJob address to:',
             partialKeep3rV1OracleJob.address

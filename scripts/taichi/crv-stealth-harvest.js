@@ -9,18 +9,7 @@ const registryData = require('../../utils/v1-registry-data.json');
 const selectStrategyPrompt = new Select({
   name: 'strategy',
   message: 'Select a crv strategy to stealth harvest',
-  choices: [
-    'ycrv',
-    'busd',
-    'sbtc',
-    'pool3',
-    'comp',
-    'gusd3crv',
-    'musd',
-    'usdn',
-    'susd',
-    'link',
-  ],
+  choices: ['ycrv', 'busd', 'sbtc', 'pool3', 'comp', 'gusd3crv', 'musd', 'usdn', 'susd', 'link'],
 });
 const checkEarnVaultPrompt = new Toggle({
   message: 'Check vault.earn tx first?',
@@ -58,81 +47,44 @@ function run() {
     try {
       const [owner] = await ethers.getSigners();
       const provider = ethers.getDefaultProvider();
-      const signer = new ethers.Wallet(
-        '0x' + config.accounts.mainnet.privateKey
-      ).connect(provider);
+      const signer = new ethers.Wallet('0x' + config.accounts.mainnet.privateKey).connect(provider);
 
       // Setup crv strategy keep3r
-      const crvStrategyKeep3r = await ethers.getContractAt(
-        'CrvStrategyKeep3rJob',
-        config.contracts.mainnet.jobs.crvStrategyKeep3rJob,
-        signer
-      );
+      const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3rJob', config.contracts.mainnet.jobs.crvStrategyKeep3rJob, signer);
 
       const strategy = await selectStrategyPrompt.run();
       if (!strategy) reject('no strategy');
       console.log('using strategy:', strategy);
 
       // Setup crv strategy
-      const strategyContract = await ethers.getContractAt(
-        'StrategyCurveYVoterProxy',
-        config.contracts.mainnet[strategy].address,
-        signer
-      );
+      const strategyContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet[strategy].address, signer);
 
       const strategist = await strategyContract.strategist();
-      console.log(
-        `${strategy}.strategist():`,
-        strategist == crvStrategyKeep3r.address
-          ? 'crvStrategyKeep3r'
-          : strategist
-      );
+      console.log(`${strategy}.strategist():`, strategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : strategist);
 
       console.log(
         `calculateHarvest(${strategy})`,
-        (
-          await crvStrategyKeep3r.callStatic.calculateHarvest(
-            strategyContract.address
-          )
-        )
-          .div(e18)
-          .toString()
+        (await crvStrategyKeep3r.callStatic.calculateHarvest(strategyContract.address)).div(e18).toString()
       );
 
       const checkVaultEarnTx = await checkEarnVaultPrompt.run();
       let sendVaultEarnTx = false;
       if (checkVaultEarnTx) {
         // Setup vault
-        const vaultData = registryData.find(
-          (data) => data.strategy === strategyContract.address
-        );
+        const vaultData = registryData.find((data) => data.strategy === strategyContract.address);
         const vault = {
-          contract: await ethers.getContractAt(
-            'IV1Vault',
-            vaultData.address,
-            owner
-          ),
+          contract: await ethers.getContractAt('IV1Vault', vaultData.address, owner),
         };
         vault.token = await vault.contract.token();
-        vault.tokenContract = await ethers.getContractAt(
-          'ERC20Mock',
-          vault.token
-        );
+        vault.tokenContract = await ethers.getContractAt('ERC20Mock', vault.token);
         vault.tokenSymbol = await vault.tokenContract.symbol();
         vault.tokenDecimals = await vault.tokenContract.decimals();
         vault.available = await vault.contract.available();
         vault.decimals = await vault.contract.decimals();
         // TODO print available with token decimals and token name
-        console.log(
-          vault.tokenSymbol,
-          'available in vault:',
-          bnToDecimal(vault.available, vault.tokenDecimals)
-        );
+        console.log(vault.tokenSymbol, 'available in vault:', bnToDecimal(vault.available, vault.tokenDecimals));
         await vault.contract.earn();
-        console.log(
-          'after earn:',
-          bnToDecimal(await vault.contract.available(), vault.tokenDecimals)
-        );
+        console.log('after earn:', bnToDecimal(await vault.contract.available(), vault.tokenDecimals));
 
         sendVaultEarnTx = await earnVaultPrompt.run();
       }
@@ -172,20 +124,15 @@ function run() {
 
       let rawMessage;
       if (sendVaultEarnTx) {
-        rawMessage = await vault.contract
-          .connect(signer)
-          .populateTransaction.earn({
-            gasPrice,
-            nonce,
-          });
+        rawMessage = await vault.contract.connect(signer).populateTransaction.earn({
+          gasPrice,
+          nonce,
+        });
       } else {
-        rawMessage = await crvStrategyKeep3r.populateTransaction.forceWork(
-          strategyContract.address,
-          {
-            gasPrice,
-            nonce,
-          }
-        );
+        rawMessage = await crvStrategyKeep3r.populateTransaction.forceWork(strategyContract.address, {
+          gasPrice,
+          nonce,
+        });
       }
 
       console.log(rawMessage);
