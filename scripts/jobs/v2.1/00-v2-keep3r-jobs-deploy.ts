@@ -38,68 +38,71 @@ function promptAndSubmit(
           //   v2Keeper.address
           // );
           // console.log();
-
-          // console.log(
-          //   'TendV2Keep3rJob:',
-          //   mechanicsContracts.registry, // address _mechanicsRegistry,
-          //   config.contracts.mainnet.oracle.yUnsafeOracleV1, // address _yOracle,
-          //   config.contracts.mainnet.keep3r.address, // address _keep3r,
-          //   ZERO_ADDRESS, // address _bond,
-          //   e18.mul(50).toString(), // 50 KP3R required // uint256 _minBond,
-          //   0, // uint256 _earned,
-          //   0, // uint256 _age,
-          //   true, // bool _onlyEOA,
-          //   v2Keeper.address, // address _v2Keeper,
-          //   60 * 5 // 5 minutes // uint256 _workCooldown
-          // );
-          // const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
-          //   mechanicsContracts.registry,
-          //   config.contracts.mainnet.oracle.yUnsafeOracleV1,
-          //   config.contracts.mainnet.keep3r.address,
-          //   ZERO_ADDRESS,
-          //   e18.mul(50), // 50 KP3R required
-          //   0,
-          //   0,
-          //   true,
-          //   v2Keeper.address,
-          //   60 * 5 // 5 minutes // uint256 _workCooldown
-          // );
-          // console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
-          // console.log(
-          //   'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
-          //   tendV2Keep3rJob.address
-          // );
-          // console.log();
-
           console.log(
-            'HarvestV2Keep3rStealthJob:',
+            'TendV2Keep3rJob:',
             mechanicsContracts.registry, // address _mechanicsRegistry,
-            contracts.stealthRelayer.mainnet, // address _stealthRelayer
-            yOracleContracts.yUnsafeOracleV1.mainnet, // address _yOracle
+            config.contracts.mainnet.oracle.yUnsafeOracleV1, // address _yOracle,
             config.contracts.mainnet.keep3r.address, // address _keep3r,
             ZERO_ADDRESS, // address _bond,
             e18.mul(50).toString(), // 50 KP3R required // uint256 _minBond,
             0, // uint256 _earned,
             0, // uint256 _age,
             true, // bool _onlyEOA,
-            v2Keeper.address, // address _v2Keeper
-            6 * 60 * 60 // uint256 _workCooldown // 6 hours
+            v2Keeper.address, // address _v2Keeper,
+            60 * 5 // 5 minutes // uint256 _workCooldown
           );
-          const harvestV2Keep3rJob = await HarvestV2Keep3rStealthJob.deploy(
-            mechanicsContracts.registry, // address _mechanicsRegistry,
-            contracts.stealthRelayer.mainnet, // address _stealthRelayer
-            yOracleContracts.yUnsafeOracleV1.mainnet, // address _yOracle
-            config.contracts.mainnet.keep3r.address, // address _keep3r,
-            ZERO_ADDRESS, // address _bond,
-            e18.mul(50), // 50 KP3R required // uint256 _minBond,
-            0, // uint256 _earned,
-            0, // uint256 _age,
-            true, // bool _onlyEOA,
-            v2Keeper.address, // address _v2Keeper
-            6 * 60 * 60 // uint256 _workCooldown // 6 hours
+          const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
+            mechanicsContracts.registry,
+            config.contracts.mainnet.oracle.yUnsafeOracleV1,
+            config.contracts.mainnet.keep3r.address,
+            ZERO_ADDRESS,
+            e18.mul(50), // 50 KP3R required
+            0,
+            0,
+            true,
+            v2Keeper.address,
+            60 * 5 // 5 minutes // uint256 _workCooldown
           );
-          console.log('HarvestV2Keep3rStealthJob address:', harvestV2Keep3rJob.address);
-          console.log('PLEASE: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:', harvestV2Keep3rJob.address);
+          console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
+          console.log('PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:', tendV2Keep3rJob.address);
+          console.log();
+
+          // console.log(
+          //   'HarvestV2Keep3rStealthJob:',
+          //   mechanicsContracts.registry, // address _mechanicsRegistry,
+          //   contracts.stealthRelayer.mainnet, // address _stealthRelayer
+          //   yOracleContracts.yUnsafeOracleV1.mainnet, // address _yOracle
+          //   config.contracts.mainnet.keep3r.address, // address _keep3r,
+          //   ZERO_ADDRESS, // address _bond,
+          //   e18.mul(50).toString(), // 50 KP3R required // uint256 _minBond,
+          //   0, // uint256 _earned,
+          //   0, // uint256 _age,
+          //   true, // bool _onlyEOA,
+          //   v2Keeper.address, // address _v2Keeper
+          //   6 * 60 * 60 // uint256 _workCooldown // 6 hours
+          // );
+          // const harvestV2Keep3rJob = await HarvestV2Keep3rStealthJob.deploy(
+          //   mechanicsContracts.registry, // address _mechanicsRegistry,
+          //   contracts.stealthRelayer.mainnet, // address _stealthRelayer
+          //   yOracleContracts.yUnsafeOracleV1.mainnet, // address _yOracle
+          //   config.contracts.mainnet.keep3r.address, // address _keep3r,
+          //   ZERO_ADDRESS, // address _bond,
+          //   e18.mul(50), // 50 KP3R required // uint256 _minBond,
+          //   0, // uint256 _earned,
+          //   0, // uint256 _age,
+          //   true, // bool _onlyEOA,
+          //   v2Keeper.address, // address _v2Keeper
+          //   6 * 60 * 60 // uint256 _workCooldown // 6 hours
+          // );
+          // console.log(
+          //   'HarvestV2Keep3rStealthJob address:',
+          //   harvestV2Keep3rJob.address
+          // );
+          // console.log(
+          //   'PLEASE: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:',
+          //   harvestV2Keep3rJob.address
+          // );
+
           resolve();
         } catch (err) {
           reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
