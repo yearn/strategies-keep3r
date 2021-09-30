@@ -1,11 +1,13 @@
 export const stealthVault = {
   mainnet: '0xC454F4E1DDB39c8De9663287D52b0E4Feb4cA45E',
   goerli: '0x093a60a183245b9ce41fBe5Bd0ef6b1A0AA52A65',
+  rinkeby: '0xe72d641f09a48cce6997377d13b2Ac7029c642b2',
 };
 
 export const stealthRelayer = {
   mainnet: '0x0a61c2146A7800bdC278833F21EBf56Cd660EE2a',
   goerli: '0x6ABEF8eF9dF993c5a8f32484E0ae248281227C83',
+  rinkeby: '0x292fd0E1De7648bA08691dBDe97313Cdcdc161cb',
 };
 
 export const harvestV2Keep3rStealthJob = {
@@ -62,4 +64,9 @@ export const tendV2Keep3rJob = {
 };
 export const betaTendV2Keep3rJob = {
   mainnet: '0xf72D7E44ec3F79379912B8d0f661bE954a101159',
+};
+
+export const stealthRelayerGuard = {
+  mainnet: '',
+  rinkeby: '0xC190B246e9fe7026240e464bf28c0ba645CD81c3',
 };

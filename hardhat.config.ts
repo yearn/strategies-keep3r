@@ -32,6 +32,11 @@ const networks: NetworksUserConfig = process.env.TEST
         accounts: [(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
         tags: ['production'],
       },
+      rinkeby: {
+        url: getNodeUrl('rinkeby'),
+        accounts: [(process.env.RINKEBY_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        tags: ['production'],
+      },
       polygon: {
         url: getNodeUrl('polygon'),
         accounts: [(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
