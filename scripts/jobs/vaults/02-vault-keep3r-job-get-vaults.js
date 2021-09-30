@@ -1,11 +1,6 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const {
-  bn,
-  e18,
-  e18ToDecimal,
-  ZERO_ADDRESS,
-} = require('../../../utils/web3-utils');
+const { bn, e18, e18ToDecimal, ZERO_ADDRESS } = require('../../../utils/web3-utils');
 const { v1Vaults } = require('../../../utils/v1-vaults');
 const config = require('../../../.config.json');
 const mainnetContracts = config.contracts.mainnet;
@@ -28,16 +23,10 @@ function run() {
         method: 'hardhat_impersonateAccount',
         params: [config.accounts.mainnet.deployer],
       });
-      deployer = owner.provider.getUncheckedSigner(
-        config.accounts.mainnet.deployer
-      );
+      deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     }
 
-    const vaultKeep3rJob = await ethers.getContractAt(
-      'VaultKeep3rJob',
-      mainnetContracts.jobs.vaultKeep3rJob,
-      deployer
-    );
+    const vaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', mainnetContracts.jobs.vaultKeep3rJob, deployer);
 
     // Checks if local data matches chain data
     const addedVaults = await vaultKeep3rJob.vaults();

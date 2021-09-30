@@ -37,9 +37,7 @@ function promptAndSubmit(): Promise<void | Error> {
         method: 'hardhat_impersonateAccount',
         params: [accounts.yKeeperWorker],
       });
-      const yKeeperWorker: any = ethers.provider.getUncheckedSigner(
-        accounts.yKeeperWorker
-      ) as any as SignerWithAddress;
+      const yKeeperWorker: any = ethers.provider.getUncheckedSigner(accounts.yKeeperWorker) as any as SignerWithAddress;
       yKeeperWorker.address = yKeeperWorker._address;
       signer = yKeeperWorker;
     }
@@ -62,11 +60,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
       // await mechanicsRegistry.addMechanic(blockProtection.address);
 
-      blockProtection = await ethers.getContractAt(
-        'BlockProtection',
-        contracts.blockProtection.mainnet,
-        signer
-      );
+      blockProtection = await ethers.getContractAt('BlockProtection', contracts.blockProtection.mainnet, signer);
 
       const harvestV2Keep3rStealthJob = await ethers.getContractAt(
         'HarvestV2Keep3rStealthJob',
@@ -74,22 +68,17 @@ function promptAndSubmit(): Promise<void | Error> {
         signer
       );
 
-      const strategies =
-        await harvestV2Keep3rStealthJob.callStatic.strategies();
+      const strategies = await harvestV2Keep3rStealthJob.callStatic.strategies();
       // const strategies = ['0xeC088B98e71Ba5FFAf520c2f6A6F0153f1bf494B'];
 
       console.log('strategies:', strategies);
       for (const strategy of strategies) {
         try {
-          const workableStrategy =
-            await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
+          const workableStrategy = await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
           console.log(strategy, 'workable:', workableStrategy);
 
           if (!workableStrategy) continue;
-          const workTx =
-            await harvestV2Keep3rStealthJob.populateTransaction.forceWorkUnsafe(
-              strategy
-            );
+          const workTx = await harvestV2Keep3rStealthJob.populateTransaction.forceWorkUnsafe(strategy);
 
           // const blockNumber = await ethers.provider.getBlockNumber();
           // await blockProtection.connect(signer).callWithBlockProtection(workTx.to, workTx.data, blockNumber + 1);
@@ -123,22 +112,17 @@ function promptAndSubmit(): Promise<void | Error> {
 
 async function flashBotsSendTx(workTx: PopulatedTransaction): Promise<any> {
   const network = await ethers.provider.getNetwork();
-  if (network.chainId != 1)
-    return 'not on mainnet network. please use --network mainnet';
+  if (network.chainId != 1) return 'not on mainnet network. please use --network mainnet';
   const provider = ethers.provider;
 
   console.log('creating signer');
-  const signer = new ethers.Wallet(
-    process.env.MAINNET_PRIVATE_KEY as string
-  ).connect(provider);
+  const signer = new ethers.Wallet(process.env.MAINNET_PRIVATE_KEY as string).connect(provider);
 
   // `authSigner` is an Ethereum private key that does NOT store funds and is NOT your bot's primary key.
   // This is an identifying key for signing payloads to establish reputation and whitelisting
   // In production, this should be used across multiple bundles to build relationship. In this example, we generate a new wallet each time
   console.log('creating flashbotSigner');
-  const flashbotSigner = new ethers.Wallet(
-    process.env.FLASHBOTS_PRIVATE_KEY as string
-  ).connect(provider);
+  const flashbotSigner = new ethers.Wallet(process.env.FLASHBOTS_PRIVATE_KEY as string).connect(provider);
 
   // Flashbots provider requires passing in a standard provider
   console.log('creating flashbotsProvider');
@@ -169,17 +153,16 @@ async function flashBotsSendTx(workTx: PopulatedTransaction): Promise<any> {
   // build stealth tx
   let nonce = ethers.BigNumber.from(await signer.getTransactionCount());
 
-  const executeTx =
-    await blockProtection.populateTransaction.callWithBlockProtection(
-      workTx.to, // address _to,
-      workTx.data, // bytes memory _data,
-      targetBlockNumber, // uint256 _blockNumber
-      {
-        nonce,
-        gasPrice: fairGasPrice,
-        gasLimit: 5_000_000,
-      }
-    );
+  const executeTx = await blockProtection.populateTransaction.callWithBlockProtection(
+    workTx.to, // address _to,
+    workTx.data, // bytes memory _data,
+    targetBlockNumber, // uint256 _blockNumber
+    {
+      nonce,
+      gasPrice: fairGasPrice,
+      gasLimit: 5_000_000,
+    }
+  );
 
   const signedTransaction = await signer.signTransaction(executeTx);
 
@@ -192,16 +175,10 @@ async function flashBotsSendTx(workTx: PopulatedTransaction): Promise<any> {
   const signedBundle = await flashbotsProvider.signBundle(bundle);
   let simulation: SimulationResponse;
   try {
-    simulation = await flashbotsProvider.simulate(
-      signedBundle,
-      targetBlockNumber
-    );
+    simulation = await flashbotsProvider.simulate(signedBundle, targetBlockNumber);
   } catch (error) {
     if ('body' in error && 'message' in JSON.parse(error.body).error) {
-      console.log(
-        '[Simulation Error] Message:',
-        JSON.parse(error.body).error.message
-      );
+      console.log('[Simulation Error] Message:', JSON.parse(error.body).error.message);
     } else {
       console.log(error);
     }
@@ -219,17 +196,16 @@ async function flashBotsSendTx(workTx: PopulatedTransaction): Promise<any> {
   //   .div(100)
   //   .mul(simulation.totalGasUsed);
 
-  const executeTxRepriced =
-    await blockProtection.populateTransaction.callWithBlockProtection(
-      workTx.to, // address _to,
-      workTx.data, // bytes memory _data,
-      targetBlockNumber, // uint256 _blockNumber
-      {
-        nonce,
-        gasPrice: fairGasPrice,
-        gasLimit: 5_000_000,
-      }
-    );
+  const executeTxRepriced = await blockProtection.populateTransaction.callWithBlockProtection(
+    workTx.to, // address _to,
+    workTx.data, // bytes memory _data,
+    targetBlockNumber, // uint256 _blockNumber
+    {
+      nonce,
+      gasPrice: fairGasPrice,
+      gasLimit: 5_000_000,
+    }
+  );
 
   simulation = await flashbotsProvider.simulate(
     await flashbotsProvider.signBundle([
@@ -242,19 +218,16 @@ async function flashBotsSendTx(workTx: PopulatedTransaction): Promise<any> {
   console.log(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`);
 
   // send bundle
-  const flashbotsTransactionResponse: FlashbotsTransaction =
-    await flashbotsProvider.sendBundle(
-      [
-        {
-          signedTransaction: await signer.signTransaction(executeTxRepriced),
-        },
-      ],
-      targetBlockNumber
-    );
+  const flashbotsTransactionResponse: FlashbotsTransaction = await flashbotsProvider.sendBundle(
+    [
+      {
+        signedTransaction: await signer.signTransaction(executeTxRepriced),
+      },
+    ],
+    targetBlockNumber
+  );
 
-  const resolution = await (
-    flashbotsTransactionResponse as FlashbotsTransactionResponse
-  ).wait();
+  const resolution = await (flashbotsTransactionResponse as FlashbotsTransactionResponse).wait();
 
   if (resolution == FlashbotsBundleResolution.BundleIncluded) {
     console.log('BundleIncluded, sucess!');

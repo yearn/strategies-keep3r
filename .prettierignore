@@ -4,23 +4,24 @@
 .husky
 .gitignore
 .gitattributes
-.versionrc
-.env
 .env.example
+.env
 *.skip*
+.DS_STORE
+workspace.code-workspace
 
 # Hardhat
+typechained
 artifacts
 cache
+deployments
+gasReporterOutput.json
 
 # JS
 node_modules
-package-lock.json
 yarn.lock
-
-# Coverage
-coverage
-coverage.json
 
 # Solidity
 contracts/mock
+contracts-no-compile
+*.skip

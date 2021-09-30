@@ -2,80 +2,80 @@
 pragma solidity 0.8.4;
 
 interface IStealthVault {
-    //events
-    event Bonded(address indexed _caller, uint256 _amount, uint256 _finalBond);
-    event Unbonded(address indexed _caller, uint256 _amount, uint256 _finalBond);
-    event ReportedHash(bytes32 _hash, address _reportedBy);
-    event PenaltyApplied(bytes32 _hash, address _caller, uint256 _penalty, address _reportedBy);
-    event ValidatedHash(bytes32 _hash, address _caller, uint256 _penalty);
+  //events
+  event Bonded(address indexed _caller, uint256 _amount, uint256 _finalBond);
+  event Unbonded(address indexed _caller, uint256 _amount, uint256 _finalBond);
+  event ReportedHash(bytes32 _hash, address _reportedBy);
+  event PenaltyApplied(bytes32 _hash, address _caller, uint256 _penalty, address _reportedBy);
+  event ValidatedHash(bytes32 _hash, address _caller, uint256 _penalty);
 
-    event StealthContractEnabled(address indexed _caller, address _contract);
+  event StealthContractEnabled(address indexed _caller, address _contract);
 
-    event StealthContractsEnabled(address indexed _caller, address[] _contracts);
+  event StealthContractsEnabled(address indexed _caller, address[] _contracts);
 
-    event StealthContractDisabled(address indexed _caller, address _contract);
+  event StealthContractDisabled(address indexed _caller, address _contract);
 
-    event StealthContractsDisabled(address indexed _caller, address[] _contracts);
+  event StealthContractsDisabled(address indexed _caller, address[] _contracts);
 
-    function isStealthVault() external pure returns (bool);
+  function isStealthVault() external pure returns (bool);
 
-    // getters
-    function callers() external view returns (address[] memory _callers);
+  // getters
+  function callers() external view returns (address[] memory _callers);
 
-    function callerContracts(address _caller) external view returns (address[] memory _contracts);
+  function callerContracts(address _caller) external view returns (address[] memory _contracts);
 
-    // global bond
-    function gasBuffer() external view returns (uint256 _gasBuffer);
+  // global bond
+  function gasBuffer() external view returns (uint256 _gasBuffer);
 
-    function totalBonded() external view returns (uint256 _totalBonded);
+  function totalBonded() external view returns (uint256 _totalBonded);
 
-    function bonded(address _caller) external view returns (uint256 _bond);
+  function bonded(address _caller) external view returns (uint256 _bond);
 
-    function canUnbondAt(address _caller) external view returns (uint256 _canUnbondAt);
+  function canUnbondAt(address _caller) external view returns (uint256 _canUnbondAt);
 
-    // global caller
-    function caller(address _caller) external view returns (bool _enabled);
+  // global caller
+  function caller(address _caller) external view returns (bool _enabled);
 
-    function callerStealthContract(address _caller, address _contract) external view returns (bool _enabled);
+  function callerStealthContract(address _caller, address _contract) external view returns (bool _enabled);
 
-    // global hash
-    function hashReportedBy(bytes32 _hash) external view returns (address _reportedBy);
+  // global hash
+  function hashReportedBy(bytes32 _hash) external view returns (address _reportedBy);
 
-    // governor
-    function setGasBuffer(uint256 _gasBuffer) external;
+  // governor
+  function setGasBuffer(uint256 _gasBuffer) external;
 
-    function transferGovernorBond(address _caller, uint256 _amount) external;
+  function transferGovernorBond(address _caller, uint256 _amount) external;
 
-    function transferBondToGovernor(address _caller, uint256 _amount) external;
+  function transferBondToGovernor(address _caller, uint256 _amount) external;
 
-    // caller
-    function bond() external payable;
+  // caller
+  function bond() external payable;
 
-    function startUnbond() external;
+  function startUnbond() external;
 
-    function cancelUnbond() external;
+  function cancelUnbond() external;
 
-    function unbondAll() external;
+  function unbondAll() external;
 
-    function unbond(uint256 _amount) external;
+  function unbond(uint256 _amount) external;
 
-    function enableStealthContract(address _contract) external;
+  function enableStealthContract(address _contract) external;
 
-    function enableStealthContracts(address[] calldata _contracts) external;
+  function enableStealthContracts(address[] calldata _contracts) external;
 
-    function disableStealthContract(address _contract) external;
+  function disableStealthContract(address _contract) external;
 
-    function disableStealthContracts(address[] calldata _contracts) external;
+  function disableStealthContracts(address[] calldata _contracts) external;
 
-    // stealth-contract
-    function validateHash(
-        address _caller,
-        bytes32 _hash,
-        uint256 _penalty
-    ) external returns (bool);
+  // stealth-contract
+  function validateHash(
+    address _caller,
+    bytes32 _hash,
+    uint256 _penalty
+  ) external returns (bool);
 
-    // watcher
-    function reportHash(bytes32 _hash) external;
+  // watcher
+  function reportHash(bytes32 _hash) external;
 
-    function reportHashAndPay(bytes32 _hash) external payable;
+  function reportHashAndPay(bytes32 _hash) external payable;
 }

@@ -10,9 +10,7 @@ const prompt = new Confirm({
 
 async function main() {
   await hre.run('compile');
-  const Keep3rEscrow = await ethers.getContractFactory(
-    'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow'
-  );
+  const Keep3rEscrow = await ethers.getContractFactory('contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow');
 
   await promptAndSubmit(Keep3rEscrow);
 }
@@ -24,17 +22,10 @@ function promptAndSubmit(Keep3rEscrow) {
         if (answer) {
           console.time('Keep3rEscrow deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-          const keep3rEscrow = await Keep3rEscrow.deploy(
-            escrowContracts.governance,
-            escrowContracts.keep3r,
-            escrowContracts.lpToken
-          );
+          const keep3rEscrow = await Keep3rEscrow.deploy(escrowContracts.governance, escrowContracts.keep3r, escrowContracts.lpToken);
           console.timeEnd('Keep3rEscrow deployed');
           console.log('Keep3rEscrow address:', keep3rEscrow.address);
-          console.log(
-            'PLEASE: change .config.json & example.config.json keep3rEscrow address to:',
-            keep3rEscrow.address
-          );
+          console.log('PLEASE: change .config.json & example.config.json keep3rEscrow address to:', keep3rEscrow.address);
           resolve();
         } else {
           console.error('Aborted!');

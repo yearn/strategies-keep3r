@@ -12,10 +12,7 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('checking workable strategies on HarvestV2Keep3rJob contract');
     try {
       // Setup HarvestV2Keep3rJob
-      const harvestV2Keep3rJob = await ethers.getContractAt(
-        'HarvestV2Keep3rJob',
-        mainnetContracts.proxyJobs.harvestV2Keep3rJob
-      );
+      const harvestV2Keep3rJob = await ethers.getContractAt('HarvestV2Keep3rJob', mainnetContracts.proxyJobs.harvestV2Keep3rJob);
 
       const workable = await harvestV2Keep3rJob.callStatic.workable();
       const getWorkData = await harvestV2Keep3rJob.callStatic.getWorkData();
@@ -24,15 +21,12 @@ function promptAndSubmit(): Promise<void | Error> {
       const strategies = await harvestV2Keep3rJob.callStatic.strategies();
       console.log('strategies:', strategies);
       for (const strategy of strategies) {
-        const workableStrategy =
-          await harvestV2Keep3rJob.callStatic.workableStrategy(strategy);
+        const workableStrategy = await harvestV2Keep3rJob.callStatic.workableStrategy(strategy);
         console.log(strategy, 'workable:', workableStrategy);
       }
       resolve();
     } catch (err) {
-      reject(
-        `Error while checking workable strategies on HarvestV2Keep3rJob contract: ${err.message}`
-      );
+      reject(`Error while checking workable strategies on HarvestV2Keep3rJob contract: ${err.message}`);
     }
   });
 }

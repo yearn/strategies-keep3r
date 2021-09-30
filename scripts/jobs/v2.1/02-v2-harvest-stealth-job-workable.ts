@@ -20,18 +20,13 @@ function promptAndSubmit(): Promise<void | Error> {
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
-          const harvestV2Keep3rStealthJob = await ethers.getContractAt(
-            'HarvestV2Keep3rStealthJob',
-            contracts.harvestV2Keep3rStealthJob.mainnet
-          );
+          const harvestV2Keep3rStealthJob = await ethers.getContractAt('HarvestV2Keep3rStealthJob', contracts.harvestV2Keep3rStealthJob.mainnet);
 
-          const strategies =
-            await harvestV2Keep3rStealthJob.callStatic.strategies();
+          const strategies = await harvestV2Keep3rStealthJob.callStatic.strategies();
           console.log('strategies:', strategies);
           for (const strategy of strategies) {
             try {
-              const workableStrategy =
-                await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
+              const workableStrategy = await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
               console.log(strategy, 'workable:', workableStrategy);
             } catch (error) {
               console.log(error);
@@ -40,9 +35,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
           resolve();
         } catch (err) {
-          reject(
-            `Error while deploying v2 keep3r job contracts: ${err.message}`
-          );
+          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
         }
       } else {
         console.error('Aborted!');

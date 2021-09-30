@@ -1,50 +1,55 @@
 import 'dotenv/config';
-import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
+import '@typechain/hardhat';
+import '@typechain/hardhat/dist/type-extensions';
 import { removeConsoleLog } from 'hardhat-preprocessor';
 import 'hardhat-gas-reporter';
+import 'hardhat-deploy';
 import 'solidity-coverage';
+import { HardhatUserConfig, MultiSolcUserConfig, NetworksUserConfig } from 'hardhat/types';
+import { DEFAULT_ACCOUNT, getNodeUrl } from './utils/network';
+import 'tsconfig-paths/register';
 
-module.exports = {
-  defaultNetwork: 'hardhat',
-  networks:
-    !process.env.FORK && process.env.TEST
-      ? {}
-      : {
-          hardhat: {
-            forking: {
-              enabled: process.env.FORK ? true : false,
-              url: process.env.MAINNET_HTTPS_URL,
-            },
-          },
-          // localMainnet: {
-          //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
-          //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
-          // },
-          mainnet: {
-            url: process.env.MAINNET_HTTPS_URL,
-            accounts: [process.env.MAINNET_PRIVATE_KEY],
-            gasPrice: 65000000000, // 65 gwei
-          },
-          ftm: {
-            url: 'https://rpc.ftm.tools',
-            accounts: [process.env.FTM_PRIVATE_KEY],
-            // gasPrice: 65000000000, // 65 gwei
-          },
-          polygonMainnet: {
-            url: 'https://rpc-mainnet.matic.quiknode.pro',
-            accounts: [process.env.POLYGON_PRIVATE_KEY],
-            gasPrice: 5000000000, // 5 gwei
-          },
-          staticMainnet: {
-            url: process.env.MAINNET_HTTPS_URL,
-            accounts: [
-              '0x0000000000000000000000000000000000000000000000000000000000000001',
-            ],
-            gasPrice: 1, // 1 wei
-          },
+const networks: NetworksUserConfig = process.env.TEST
+  ? {}
+  : {
+      hardhat: {
+        forking: {
+          enabled: process.env.FORK ? true : false,
+          url: getNodeUrl('mainnet'),
         },
+      },
+      localhost: {
+        url: getNodeUrl('localhost'),
+        live: false,
+        accounts: [(process.env.LOCAL_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        tags: ['local'],
+      },
+      mainnet: {
+        url: getNodeUrl('mainnet'),
+        accounts: [(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        tags: ['production'],
+      },
+      polygon: {
+        url: getNodeUrl('polygon'),
+        accounts: [(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        tags: ['production'],
+      },
+      fantom: {
+        url: getNodeUrl('fantom'),
+        accounts: [(process.env.FANTOM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        tags: ['production'],
+      },
+    };
+
+const config: HardhatUserConfig = {
+  defaultNetwork: 'hardhat',
+  mocha: {
+    timeout: process.env.MOCHA_TIMEOUT || 300000,
+  },
+  networks,
   solidity: {
     compilers: [
       {
@@ -71,9 +76,10 @@ module.exports = {
     ],
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS ? true : false,
-    currency: process.env.COINMARKETCAP_DEFAULT_CURRENCY,
+    currency: process.env.COINMARKETCAP_DEFAULT_CURRENCY || 'USD',
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    enabled: true,
+    outputFile: 'gasReporterOutput.json',
   },
   preprocess: {
     eachLine: removeConsoleLog((hre) => hre.network.name !== 'hardhat'),
@@ -81,4 +87,23 @@ module.exports = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  typechain: {
+    outDir: 'typechained',
+    target: 'ethers-v5',
+  },
 };
+
+if (process.env.TEST) {
+  (config.solidity as MultiSolcUserConfig).compilers = (config.solidity as MultiSolcUserConfig).compilers.map((compiler) => {
+    return {
+      ...compiler,
+      outputSelection: {
+        '*': {
+          '*': ['storageLayout'],
+        },
+      },
+    };
+  });
+}
+
+export default config;

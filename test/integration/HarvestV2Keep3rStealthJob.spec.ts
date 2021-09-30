@@ -2,15 +2,15 @@ import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../utils/web3-utils';
 import config from '../../contracts.json';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers';
 import { BigNumber } from 'ethers';
 import * as contracts from '../../utils/contracts';
 import * as yOracleContracts from '@lbertenasco/y-oracle/dist/utils/contracts';
+import { wallet } from '@test-utils';
 
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 
-const lowerCaseArray = (array: string[]) =>
-  array.map((address: string) => address.toLowerCase());
+const lowerCaseArray = (array: string[]) => array.map((address: string) => address.toLowerCase());
 
 describe('HarvestV2Keep3rStealthJob', () => {
   let owner: SignerWithAddress;
@@ -20,62 +20,22 @@ describe('HarvestV2Keep3rStealthJob', () => {
   });
 
   it('Should deploy on mainnet fork', async function () {
-    await network.provider.request({
-      method: 'hardhat_impersonateAccount',
-      params: [config.accounts.mainnet.publicKey],
-    });
-    const multisig = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.publicKey
-    );
+    const multisig = await wallet.impersonate(config.accounts.mainnet.publicKey);
+    const deployer = await wallet.impersonate(config.accounts.mainnet.deployer);
+    const keeper = await wallet.impersonate(config.accounts.mainnet.keeper);
+    const keep3rGovernance = await wallet.impersonate(config.accounts.mainnet.keep3rGovernance);
+    const whale = await wallet.impersonate(config.accounts.mainnet.whale);
 
-    await network.provider.request({
-      method: 'hardhat_impersonateAccount',
-      params: [config.accounts.mainnet.deployer],
+    (await ethers.getContractFactory('ForceETH')).deploy(keep3rGovernance._address, {
+      value: e18.mul(100),
     });
-    const deployer = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.deployer
-    );
-    await network.provider.request({
-      method: 'hardhat_impersonateAccount',
-      params: [config.accounts.mainnet.keeper],
-    });
-    const keeper = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.keeper
-    );
-    await network.provider.request({
-      method: 'hardhat_impersonateAccount',
-      params: [config.accounts.mainnet.keep3rGovernance],
-    });
-    const keep3rGovernance = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.keep3rGovernance
-    );
-    // impersonate whale
-    await network.provider.request({
-      method: 'hardhat_impersonateAccount',
-      params: [config.accounts.mainnet.whale],
-    });
-    const whale = ethers.provider.getUncheckedSigner(
-      config.accounts.mainnet.whale
-    );
-    (await ethers.getContractFactory('ForceETH')).deploy(
-      keep3rGovernance._address,
-      {
-        value: e18.mul(100),
-      }
-    );
     (await ethers.getContractFactory('ForceETH')).deploy(keeper._address, {
       value: e18.mul(100),
     });
 
-    const v2Keeper = await ethers.getContractAt(
-      'V2Keeper',
-      config.contracts.mainnet.proxyJobs.v2Keeper,
-      deployer
-    );
+    const v2Keeper = await ethers.getContractAt('V2Keeper', config.contracts.mainnet.proxyJobs.v2Keeper, deployer);
 
-    const HarvestV2Keep3rStealthJob = await ethers.getContractFactory(
-      'HarvestV2Keep3rStealthJob'
-    );
+    const HarvestV2Keep3rStealthJob = await ethers.getContractFactory('HarvestV2Keep3rStealthJob');
 
     const harvestV2Keep3rStealthJob = (
       await HarvestV2Keep3rStealthJob.deploy(
@@ -97,11 +57,7 @@ describe('HarvestV2Keep3rStealthJob', () => {
     await v2Keeper.addJob(harvestV2Keep3rStealthJob.address);
 
     // Add to keep3r
-    const keep3r = await ethers.getContractAt(
-      'IKeep3rV1',
-      config.contracts.mainnet.keep3r.address,
-      keep3rGovernance
-    );
+    const keep3r = await ethers.getContractAt('IKeep3rV1', config.contracts.mainnet.keep3r.address, keep3rGovernance);
     await keep3r.addJob(harvestV2Keep3rStealthJob.address);
     await keep3r.addKPRCredit(harvestV2Keep3rStealthJob.address, e18.mul(100));
 
@@ -129,52 +85,30 @@ describe('HarvestV2Keep3rStealthJob', () => {
     }
 
     const jobStrategies = await harvestV2Keep3rStealthJob.strategies();
-    expect(lowerCaseArray(jobStrategies)).to.be.deep.eq(
-      lowerCaseArray(strategies.map((s) => s.address))
-    );
+    expect(lowerCaseArray(jobStrategies)).to.be.deep.eq(lowerCaseArray(strategies.map((s) => s.address)));
 
-    let workable = await harvestV2Keep3rStealthJob.callStatic.workable(
-      strategies[0].address
-    );
+    let workable = await harvestV2Keep3rStealthJob.callStatic.workable(strategies[0].address);
     console.log({ workable });
 
     // Stealth contracts and setup
-    const stealthVault = await ethers.getContractAt(
-      'IStealthVault',
-      contracts.stealthVault.mainnet,
-      deployer
-    );
-    const stealthRelayer = await ethers.getContractAt(
-      'IStealthRelayer',
-      contracts.stealthRelayer.mainnet,
-      deployer
-    );
+    const stealthVault = await ethers.getContractAt('IStealthVault', contracts.stealthVault.mainnet, deployer);
+    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet, deployer);
     // Set job in stealth relayer
     await stealthRelayer.addJob(harvestV2Keep3rStealthJob.address);
 
     // keeper stealthVault setup
     const penalty = await stealthRelayer.callStatic.penalty();
     await stealthVault.connect(keeper).bond({ value: penalty });
-    await stealthVault
-      .connect(keeper)
-      .enableStealthContract(stealthRelayer.address);
+    await stealthVault.connect(keeper).enableStealthContract(stealthRelayer.address);
 
     // populates work transaction
-    const rawTx = await harvestV2Keep3rStealthJob.populateTransaction.work(
-      strategies[0].address
-    );
+    const rawTx = await harvestV2Keep3rStealthJob.populateTransaction.work(strategies[0].address);
     const callData = rawTx.data;
 
-    const stealthHash = ethers.utils.solidityKeccak256(
-      ['string'],
-      ['random-secret-hash']
-    );
+    const stealthHash = ethers.utils.solidityKeccak256(['string'], ['random-secret-hash']);
     let blockNumber = await ethers.provider.getBlockNumber();
 
-    const pendingBlock = await ethers.provider.send('eth_getBlockByNumber', [
-      'latest',
-      false,
-    ]);
+    const pendingBlock = await ethers.provider.send('eth_getBlockByNumber', ['latest', false]);
     const blockGasLimit = BigNumber.from(pendingBlock.gasLimit);
 
     let workTx = await stealthRelayer.connect(keeper).execute(
@@ -188,8 +122,6 @@ describe('HarvestV2Keep3rStealthJob', () => {
     let workTxData = await workTx.wait();
     console.log('gasUsed:', workTxData.cumulativeGasUsed.toNumber());
 
-    expect(
-      await harvestV2Keep3rStealthJob.callStatic.workable(strategies[0].address)
-    ).to.be.false;
+    expect(await harvestV2Keep3rStealthJob.callStatic.workable(strategies[0].address)).to.be.false;
   });
 });

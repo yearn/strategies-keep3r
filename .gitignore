@@ -9,7 +9,10 @@ coverage
 # Hardhat files
 cache
 artifacts
+typechained
+deployments/hardhat
+deployments/localhost
+gasReporterOutput.json
 
 # Config files
 .env
-.config.json

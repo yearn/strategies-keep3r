@@ -10,9 +10,7 @@ const prompt = new Confirm({
 
 async function main() {
   await hre.run('compile');
-  const MechanicsRegistry = await ethers.getContractFactory(
-    'MechanicsRegistry'
-  );
+  const MechanicsRegistry = await ethers.getContractFactory('MechanicsRegistry');
 
   await promptAndSubmit(MechanicsRegistry);
 }
@@ -26,15 +24,10 @@ function promptAndSubmit(MechanicsRegistry) {
         if (answer) {
           console.time('MechanicsRegistry deployed');
           // Setup MechanicsRegistry
-          const mechanicsRegistry = await MechanicsRegistry.deploy(
-            owner.address
-          );
+          const mechanicsRegistry = await MechanicsRegistry.deploy(owner.address);
           console.timeEnd('MechanicsRegistry deployed');
           console.log('MechanicsRegistry address:', mechanicsRegistry.address);
-          console.log(
-            'PLEASE: change .config.json & example.config.json mechanics.registry address to:',
-            mechanicsRegistry.address
-          );
+          console.log('PLEASE: change .config.json & example.config.json mechanics.registry address to:', mechanicsRegistry.address);
           resolve();
         } else {
           console.error('Aborted!');

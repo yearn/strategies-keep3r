@@ -27,20 +27,11 @@ function promptAndSubmit() {
         deployer = (owner.provider as any).getUncheckedSigner(accounts.yKeeper);
       }
 
-      const VaultsRegistryHelper: ContractFactory =
-        await ethers.getContractFactory('VaultsRegistryHelper');
+      const VaultsRegistryHelper: ContractFactory = await ethers.getContractFactory('VaultsRegistryHelper');
       console.log(contracts.vaultsRegistry.ftm);
-      const vaultsRegistryHelper = await VaultsRegistryHelper.deploy(
-        contracts.vaultsRegistry.ftm
-      );
-      console.log(
-        'VaultsRegistryHelper address:',
-        vaultsRegistryHelper.address
-      );
-      console.log(
-        'PLEASE: change .contracts.ts vaultsRegistryHelper.ftm address to:',
-        vaultsRegistryHelper.address
-      );
+      const vaultsRegistryHelper = await VaultsRegistryHelper.deploy(contracts.vaultsRegistry.ftm);
+      console.log('VaultsRegistryHelper address:', vaultsRegistryHelper.address);
+      console.log('PLEASE: change .contracts.ts vaultsRegistryHelper.ftm address to:', vaultsRegistryHelper.address);
 
       resolve();
     } catch (err) {

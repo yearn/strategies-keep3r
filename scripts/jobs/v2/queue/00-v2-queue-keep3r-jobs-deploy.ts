@@ -7,23 +7,16 @@ const mechanicsContracts = config.contracts.mainnet.mechanics;
 const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm(
-  'Do you wish to deploy v2 queue keep3r jobs contracts?'
-);
+const prompt = new Confirm('Do you wish to deploy v2 queue keep3r jobs contracts?');
 
 async function main() {
   await run('compile');
   const V2Keeper: ContractFactory = await ethers.getContractFactory('V2Keeper');
-  const HarvestV2QueueKeep3rJob: ContractFactory =
-    await ethers.getContractFactory('HarvestV2QueueKeep3rJob');
+  const HarvestV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory('HarvestV2QueueKeep3rJob');
   const TendV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory(
     'TendV2Keep3rJob' // 'TendV2QueueKeep3rJob'
   );
-  await promptAndSubmit(
-    V2Keeper,
-    HarvestV2QueueKeep3rJob,
-    TendV2QueueKeep3rJob
-  );
+  await promptAndSubmit(V2Keeper, HarvestV2QueueKeep3rJob, TendV2QueueKeep3rJob);
 }
 
 function promptAndSubmit(
@@ -37,10 +30,7 @@ function promptAndSubmit(
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
-          const v2Keeper = await ethers.getContractAt(
-            'V2Keeper',
-            config.contracts.mainnet.proxyJobs.v2Keeper
-          );
+          const v2Keeper = await ethers.getContractAt('V2Keeper', config.contracts.mainnet.proxyJobs.v2Keeper);
           // // deploy V2Keeper // already deployed
           // console.log('V2Keeper:', mechanicsContracts.registry);
           // const v2Keeper = await V2Keeper.deploy(mechanicsContracts.registry);
@@ -102,19 +92,14 @@ function promptAndSubmit(
             v2Keeper.address,
             6 * 60 * 60 // 6 hours
           );
-          console.log(
-            'HarvestV2QueueKeep3rJob address:',
-            harvestV2QueueKeep3rJob.address
-          );
+          console.log('HarvestV2QueueKeep3rJob address:', harvestV2QueueKeep3rJob.address);
           console.log(
             'PLEASE: change .config.json & example.config.json proxyJobs.harvestV2QueueKeep3rJob address to:',
             harvestV2QueueKeep3rJob.address
           );
           resolve();
         } catch (err) {
-          reject(
-            `Error while deploying v2 keep3r job contracts: ${err.message}`
-          );
+          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
         }
       } else {
         console.error('Aborted!');

@@ -12,15 +12,12 @@ export async function getGasPrice() {
 
 export async function sendPrivateTransaction(signedMessage: any) {
   try {
-    const res = await axios.post(
-      'https://api.taichi.network:10001/rpc/public',
-      {
-        jsonrpc: '2.0',
-        method: 'eth_sendPrivateTransaction',
-        params: [signedMessage],
-        id: 1,
-      }
-    );
+    const res = await axios.post('https://api.taichi.network:10001/rpc/public', {
+      jsonrpc: '2.0',
+      method: 'eth_sendPrivateTransaction',
+      params: [signedMessage],
+      id: 1,
+    });
     return res.data;
   } catch (error) {
     console.error(error);
@@ -30,9 +27,7 @@ export async function sendPrivateTransaction(signedMessage: any) {
 
 export async function queryPrivateTransaction(txHash: string) {
   try {
-    const res = await axios.get(
-      'https://api.taichi.network:10001/txscan/priTx?txHash=' + txHash
-    );
+    const res = await axios.get('https://api.taichi.network:10001/txscan/priTx?txHash=' + txHash);
     return res.data;
   } catch (error) {
     console.error(error);

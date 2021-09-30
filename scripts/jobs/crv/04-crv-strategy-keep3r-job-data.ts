@@ -15,34 +15,19 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('');
     try {
       // Setup CrvStrategyKeep3rJob
-      const crvStrategyKeep3rJob = await ethers.getContractAt(
-        'CrvStrategyKeep3rJob',
-        mainnetContracts.proxyJobs.crvStrategyKeep3rJob
-      );
+      const crvStrategyKeep3rJob = await ethers.getContractAt('CrvStrategyKeep3rJob', mainnetContracts.proxyJobs.crvStrategyKeep3rJob);
 
       const strategies = await crvStrategyKeep3rJob.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest =
-          await crvStrategyKeep3rJob.callStatic.requiredHarvest(strategy);
-        const requiredEarn = await crvStrategyKeep3rJob.callStatic.requiredEarn(
-          strategy
-        );
-        const strategyData = v1CrvStrategies.find(
-          (strategyData: any) => strategyData.address == strategy
-        );
-        console.log(
-          strategyData?.name,
-          strategy,
-          requiredHarvest.toString(),
-          requiredEarn.toString()
-        );
+        const requiredHarvest = await crvStrategyKeep3rJob.callStatic.requiredHarvest(strategy);
+        const requiredEarn = await crvStrategyKeep3rJob.callStatic.requiredEarn(strategy);
+        const strategyData = v1CrvStrategies.find((strategyData: any) => strategyData.address == strategy);
+        console.log(strategyData?.name, strategy, requiredHarvest.toString(), requiredEarn.toString());
       }
       resolve();
     } catch (err) {
-      reject(
-        `Error while checking workable strategies on CrvStrategyKeep3rJob contract: ${err.message}`
-      );
+      reject(`Error while checking workable strategies on CrvStrategyKeep3rJob contract: ${err.message}`);
     }
   });
 }

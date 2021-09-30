@@ -7,9 +7,7 @@ const config = require('../../../.config.json');
 import * as contracts from '../../../utils/contracts';
 
 const { Confirm } = require('enquirer');
-const confirm = new Confirm(
-  'Do you want to modify strategies on crv keep3r job?'
-);
+const confirm = new Confirm('Do you want to modify strategies on crv keep3r job?');
 
 async function main() {
   await hre.run('compile');
@@ -29,17 +27,11 @@ function run() {
         method: 'hardhat_impersonateAccount',
         params: [config.accounts.mainnet.deployer],
       });
-      deployer = owner.provider.getUncheckedSigner(
-        config.accounts.mainnet.deployer
-      );
+      deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
     }
     console.log('using address:', deployer._address);
 
-    const crvStrategyKeep3rJob2 = await ethers.getContractAt(
-      'CrvStrategyKeep3rStealthJob2',
-      contracts.crvStrategyKeep3rJob2.mainnet,
-      deployer
-    );
+    const crvStrategyKeep3rJob2 = await ethers.getContractAt('CrvStrategyKeep3rStealthJob2', contracts.crvStrategyKeep3rJob2.mainnet, deployer);
 
     const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
 
@@ -50,15 +42,11 @@ function run() {
       if (added && strategy.added) continue;
       if (!added && !strategy.added) continue;
       console.log(strategy.name, strategy.address);
-      if (!added && strategy.added)
-        throw new Error('strategy set as added but not on job');
-      if (added && !strategy.added)
-        throw new Error('strategy set as not-added but added on job');
+      if (!added && strategy.added) throw new Error('strategy set as added but not on job');
+      if (added && !strategy.added) throw new Error('strategy set as not-added but added on job');
     }
 
-    const newV1CrvStrategies = crvStrategies.filter(
-      (strategy) => !strategy.added
-    );
+    const newV1CrvStrategies = crvStrategies.filter((strategy) => !strategy.added);
     console.log('adding', newV1CrvStrategies.length, 'new crvStrategies');
     console.log(newV1CrvStrategies.map((strategy) => strategy.name).join(', '));
 
@@ -70,12 +58,7 @@ function run() {
     await crvStrategyKeep3rJob2.addStrategies(
       newV1CrvStrategies.map((strategy) => strategy.address),
       newV1CrvStrategies.map((strategy) => strategy.requiredHarvestAmount),
-      newV1CrvStrategies.map((strategy) =>
-        bn
-          .from(10)
-          .pow(strategy.requiredEarn.decimals)
-          .mul(strategy.requiredEarn.amount)
-      )
+      newV1CrvStrategies.map((strategy) => bn.from(10).pow(strategy.requiredEarn.decimals).mul(strategy.requiredEarn.amount))
     );
     console.timeEnd('addStrategies');
 
