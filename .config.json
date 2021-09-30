@@ -2,7 +2,6 @@
   "accounts": {
     "mainnet": {
       "publicKey": "0xfeb4acf3df3cdea7399794d0869ef76a6efaff52",
-      "privateKey": "",
       "keep3rGovernance": "0x0D5Dc686d0a2ABBfDaFDFb4D0533E886517d4E83",
       "keeper": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
       "deployer": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
