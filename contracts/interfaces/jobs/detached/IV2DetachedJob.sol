@@ -3,6 +3,13 @@ pragma solidity >=0.6.8;
 import '../IKeep3rJob.sol';
 
 interface IV2DetachedJob is IKeep3rJob {
+  error MultiplierExceedsMax();
+  error NotZero();
+  error StrategyAlreadyAdded();
+  error StrategyNotAdded();
+  error RequiredAmountsDifferentLength();
+  error NotWorkable();
+
   // Setters
   event StrategyAdded(address _strategy, uint256 _requiredAmount);
   event StrategyModified(address _strategy, uint256 _requiredAmount);

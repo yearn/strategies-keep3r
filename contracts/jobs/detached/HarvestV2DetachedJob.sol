@@ -6,12 +6,13 @@ import './V2DetachedJob.sol';
 
 contract HarvestV2DetachedJob is V2DetachedJob {
   constructor(
+    address _baseFeeOracle,
     address _mechanicsRegistry,
     address _yOracle,
     address _v2Keeper,
     uint256 _workCooldown
   )
-    V2DetachedJob(_mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
+    V2DetachedJob(_baseFeeOracle, _mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
   {}
 
   function workable(address _strategy) external view override returns (bool) {

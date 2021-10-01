@@ -10,11 +10,13 @@ import '../../interfaces/jobs/detached/IV2DetachedJob.sol';
 
 import '../../interfaces/yearn/IBaseStrategy.sol';
 import '../../interfaces/oracle/IYOracle.sol';
+import '../../interfaces/utils/IBaseFee.sol';
 
 abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address public immutable baseFeeOracle;
 
   uint256 public constant PRECISION = 1_000;
   uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -36,11 +38,13 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   uint256 public workCooldown;
 
   constructor(
+    address _baseFeeOracle,
     address _mechanicsRegistry,
     address _yOracle,
     address _v2Keeper,
     uint256 _workCooldown
   ) MachineryReady(_mechanicsRegistry) {
+    baseFeeOracle = _baseFeeOracle;
     _setYOracle(_yOracle);
     V2Keeper = IV2Keeper(_v2Keeper);
     if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
@@ -64,7 +68,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   }
 
   function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-    require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, 'V2Keep3rJob::set-reward-multiplier:multiplier-exceeds-max');
+    if (_rewardMultiplier > MAX_REWARD_MULTIPLIER) revert MultiplierExceedsMax();
     rewardMultiplier = _rewardMultiplier;
   }
 
@@ -74,7 +78,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   }
 
   function _setWorkCooldown(uint256 _workCooldown) internal {
-    require(_workCooldown > 0, 'V2Keep3rJob::set-work-cooldown:should-not-be-zero');
+    if (_workCooldown == 0) revert NotZero();
     workCooldown = _workCooldown;
   }
 
@@ -85,7 +89,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
     address[] calldata _costTokens,
     address[] calldata _costPairs
   ) external override onlyGovernorOrMechanic {
-    require(_strategies.length == _requiredAmounts.length, 'V2Keep3rJob::add-strategies:strategies-required-amounts-different-length');
+    if (_strategies.length != _requiredAmounts.length) revert RequiredAmountsDifferentLength();
     for (uint256 i; i < _strategies.length; i++) {
       _addStrategy(_strategies[i], _requiredAmounts[i], _costTokens[i], _costPairs[i]);
     }
@@ -106,15 +110,14 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
     address _costToken,
     address _costPair
   ) internal {
-    require(!_availableStrategies.contains(_strategy), 'V2Keep3rJob::add-strategy:strategy-already-added');
     _setRequiredAmount(_strategy, _requiredAmount);
     _setCostTokenAndPair(_strategy, _costToken, _costPair);
     emit StrategyAdded(_strategy, _requiredAmount);
-    _availableStrategies.add(_strategy);
+    if (!_availableStrategies.add(_strategy)) revert StrategyAlreadyAdded();
   }
 
   function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
-    require(_strategies.length == _requiredAmounts.length, 'V2Keep3rJob::update-strategies:strategies-required-amounts-different-length');
+    if (_strategies.length != _requiredAmounts.length) revert RequiredAmountsDifferentLength();
     for (uint256 i; i < _strategies.length; i++) {
       _updateRequiredAmount(_strategies[i], _requiredAmounts[i]);
     }
@@ -125,7 +128,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   }
 
   function _updateRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
-    require(_availableStrategies.contains(_strategy), 'V2Keep3rJob::update-required-amount:strategy-not-added');
+    if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
     _setRequiredAmount(_strategy, _requiredAmount);
     emit StrategyModified(_strategy, _requiredAmount);
   }
@@ -143,12 +146,12 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
     address _costToken,
     address _costPair
   ) internal {
-    require(_availableStrategies.contains(_strategy), 'V2Keep3rJob::update-required-amount:strategy-not-added');
+    if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
     _setCostTokenAndPair(_strategy, _costToken, _costPair);
   }
 
   function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
-    require(_availableStrategies.contains(_strategy), 'V2Keep3rJob::remove-strategy:strategy-not-added');
+    if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
     delete requiredAmount[_strategy];
     _availableStrategies.remove(_strategy);
     emit StrategyRemoved(_strategy);
@@ -177,7 +180,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
 
   // Keeper view actions (internal)
   function _workable(address _strategy) internal view virtual returns (bool) {
-    require(_availableStrategies.contains(_strategy), 'V2Keep3rJob::workable:strategy-not-added');
+    if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
     if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy] + workCooldown) return true;
     return false;
   }
@@ -185,15 +188,14 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   // Get eth costs
   function _getCallCosts(address _strategy) internal view returns (uint256 _callCost) {
     if (requiredAmount[_strategy] == 0) return 0;
-    uint256 _ethCost = requiredAmount[_strategy] * 1 gwei;
-    // uint256 _ethCost = requiredAmount[_strategy] * block.basefee; // TODO Fix block.basefee
+    uint256 _ethCost = requiredAmount[_strategy] * IBaseFee(baseFeeOracle).basefee_global();
     if (costToken[_strategy] == address(0)) return _ethCost;
     return IYOracle(yOracle).getAmountOut(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
   }
 
   // Keep3r actions
   function _workInternal(address _strategy) internal {
-    require(_workable(_strategy), 'V2Keep3rJob::work:not-workable');
+    if (!_workable(_strategy)) revert NotWorkable();
 
     _work(_strategy);
 
