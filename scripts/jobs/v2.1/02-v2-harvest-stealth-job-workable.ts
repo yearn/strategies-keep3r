@@ -35,7 +35,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
           resolve();
         } catch (err) {
-          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
+          reject(`Error while deploying v2 keep3r job contracts: ${(err as any).message}`);
         }
       } else {
         console.error('Aborted!');

@@ -26,7 +26,7 @@ function promptAndSubmit(): Promise<void | Error> {
       }
       resolve();
     } catch (err) {
-      reject(`Error while checking workable strategies on HarvestV2Keep3rJob contract: ${err.message}`);
+      reject(`Error while checking workable strategies on HarvestV2Keep3rJob contract: ${(err as any).message}`);
     }
   });
 }
