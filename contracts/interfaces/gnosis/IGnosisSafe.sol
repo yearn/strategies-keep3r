@@ -10,6 +10,19 @@ contract Enum {
 
 interface GnosisSafe {
   function getOwners() external view returns (address[] memory);
+
+  function execTransaction(
+    address to,
+    uint256 value,
+    bytes calldata data,
+    uint8 operation,
+    uint256 safeTxGas,
+    uint256 dataGas,
+    uint256 gasPrice,
+    address gasToken,
+    address refundReceiver,
+    bytes calldata signatures
+  ) external payable;
 }
 
 interface IGuard {

@@ -18,6 +18,8 @@ interface IStealthRelayerGuard is IGuard, IGovernableAndManageable {
 
   function overrideGuardChecks() external view returns (bool _overrideGuardChecks);
 
+  function executors() external view returns (address[] memory _executorsArray);
+
   function addExecutor(address _executor) external;
 
   function removeExecutor(address _executor) external;
@@ -33,6 +35,10 @@ contract StealthRelayerGuard is UtilsReady, Manageable, OnlyStealthRelayer, ISte
   bool public override overrideGuardChecks;
 
   constructor(address _manager, address _stealthRelayer) UtilsReady() Manageable(_manager) OnlyStealthRelayer(_stealthRelayer) {}
+
+  function executors() external view override returns (address[] memory _executorsArray) {
+    return _executors.values();
+  }
 
   function addExecutor(address _executor) external override onlyGovernorOrManager {
     if (_executor == address(0)) revert ZeroAddress();
@@ -95,7 +101,7 @@ contract StealthRelayerGuard is UtilsReady, Manageable, OnlyStealthRelayer, ISte
   }
 
   modifier onlyGovernorOrManager() {
-    if (!isGovernor(msg.sender) || !isManager(msg.sender)) revert NotAuthorized();
+    if (!isGovernor(msg.sender) && !isManager(msg.sender)) revert NotAuthorized();
     _;
   }
 }

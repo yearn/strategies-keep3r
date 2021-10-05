@@ -11,10 +11,20 @@ export async function getSafeQueuedTransactions(chainId: number, safeAddress: st
     return;
   }
 }
-export async function getTransaction(chainId: number, txHash: string) {
+export async function getTransaction(chainId: number, id: string) {
   try {
-    const res = await axios.get(`https://safe-client.gnosis.io/v1/chains/${chainId}/transactions/${txHash}`);
+    const res = await axios.get(`https://safe-client.gnosis.io/v1/chains/${chainId}/transactions/${id}`);
     return res.data;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+}
+
+export async function getGasPrice() {
+  try {
+    const res = await axios.get(`https://www.gasnow.org/api/v3/gas/price`);
+    return res.data.data;
   } catch (error) {
     console.error(error);
     return;
