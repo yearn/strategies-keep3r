@@ -27,7 +27,6 @@ function mainExecute(): Promise<void | Error> {
     console.log('using address:', offchainSigner.address, 'on', networkName);
 
     try {
-      // const safeAddress = '0x23DC650A7760cA37CafD14AF5f1e0ab62cE50FA4';
       const safeAddress = await safeInputPrompt.run();
       if (safeAddress.length != 42) throw Error('invalid safeAddress length');
       const ethAdapterExecutor = new EthersAdapter({ ethers, signer: offchainSigner });
