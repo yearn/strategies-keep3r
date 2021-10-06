@@ -77,12 +77,7 @@ function mainExecute(): Promise<void | Error> {
 
         const safeTransaction = await safeSdk.createTransaction(...transactions);
 
-        const offchainSignatures: { signer: string; data: string }[] = [
-          {
-            signer: '0x00004498C01501939A62B7F5d8F519A8e4fFd61a',
-            data: '0xbcb8302367dcb172471be1030b422b8e3d6075c4e2ade64f2309d42e60357ca10719abf1da9095b34526ef6312a4872b29f4fd12381646fe907b42c1c27bfca920',
-          },
-        ];
+        const offchainSignatures: { signer: string; data: string }[] = [];
         for (const offchainsignature of offchainSignatures) {
           console.log('offchainsignature:', offchainsignature.signer, offchainsignature.data);
           if (offchainsignature.signer == executor.address) continue;
