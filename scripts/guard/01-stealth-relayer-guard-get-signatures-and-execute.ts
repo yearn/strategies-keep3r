@@ -2,7 +2,6 @@ import { run, ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
 import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk';
 import { EthSignSignature } from '@gnosis.pm/safe-core-sdk/dist/src/utils/signatures/SafeSignature';
-import { adjustVInSignature, generateSignature, isTxHashSignedWithPrefix } from '@gnosis.pm/safe-core-sdk/dist/src/utils/signatures';
 import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import {
   FlashbotsBundleProvider,
@@ -218,7 +217,6 @@ function mainExecute(): Promise<void | Error> {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    0x0000000031669ab4083265e0850030fa8dec8daf;
     console.error(error);
     process.exit(1);
   });
