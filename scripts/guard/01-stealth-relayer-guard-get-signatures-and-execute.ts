@@ -2,6 +2,7 @@ import { run, ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
 import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk';
 import { EthSignSignature } from '@gnosis.pm/safe-core-sdk/dist/src/utils/signatures/SafeSignature';
+import { adjustVInSignature, generateSignature, isTxHashSignedWithPrefix } from '@gnosis.pm/safe-core-sdk/dist/src/utils/signatures';
 import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import {
   FlashbotsBundleProvider,
@@ -38,7 +39,7 @@ function mainExecute(): Promise<void | Error> {
       let executorNonce = ethers.BigNumber.from(await executor.getTransactionCount());
 
       const safeContract = await ethers.getContractAt('GnosisSafe', safeAddress);
-      const ethAdapterExecutor = new EthersAdapter({ ethers: executor.provider, signer: executor });
+      const ethAdapterExecutor = new EthersAdapter({ ethers, signer: executor });
       const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterExecutor, safeAddress });
 
       const safeChainId = await safeSdk.getChainId();
@@ -55,6 +56,8 @@ function mainExecute(): Promise<void | Error> {
           console.log(`invalid tx status: ${safeQueuedTransaction.txStatus}`);
           continue;
         }
+        console.log('safeQueuedTransaction.id');
+        console.log(safeQueuedTransaction.id);
         const txDetails: gnosis.SafeTransactionData = await gnosis.getTransaction(safeChainId, safeQueuedTransaction.id);
         console.log(txDetails);
 
@@ -75,6 +78,8 @@ function mainExecute(): Promise<void | Error> {
 
         const safeTransaction = await safeSdk.createTransaction(...transactions);
         for (const confirmation of txDetails.detailedExecutionInfo.confirmations) {
+          console.log(confirmation);
+          if (confirmation.signer.value == executor.address) continue;
           safeTransaction.addSignature(new EthSignSignature(confirmation.signer.value, confirmation.signature));
         }
 
@@ -164,7 +169,7 @@ function mainExecute(): Promise<void | Error> {
             return reject('simulation error');
           }
           if ('error' in simulation) {
-            return reject(`Simulation Error: ${simulation.error.message}`);
+            return reject(`Simulation Error: ${(simulation as any).error.message}`);
           } else {
             console.log(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`);
           }
@@ -189,11 +194,6 @@ function mainExecute(): Promise<void | Error> {
             return reject('AccountNonceTooHigh, adjust nonce');
           }
         }
-
-        // const executeTxResponse = await safeSdk.executeTransaction(safeTransaction);
-        // console.log(executeTxResponse);
-        // await executeTxResponse.transactionResponse?.wait();
-        // console.log('executed!');
       }
 
       resolve();
