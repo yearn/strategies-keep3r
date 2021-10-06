@@ -1,6 +1,7 @@
 import { run, ethers } from 'hardhat';
 import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk';
-import SafeServiceClient, { SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 
 const { Confirm } = require('enquirer');
 const { Input } = require('enquirer');
@@ -12,6 +13,7 @@ const inputPrompt = new Input({
 
 import * as gnosis from '../../utils/gnosis';
 import { ZERO_ADDRESS } from '@utils/web3-utils';
+import { EthSignSignature } from '@gnosis.pm/safe-core-sdk/dist/src/utils/signatures/SafeSignature';
 
 async function main() {
   await run('compile');
@@ -41,27 +43,50 @@ function mainExecute(): Promise<void | Error> {
       //   pendingTxs[0].safeTxHash
       // );
 
-      console.log(tx);
+      // console.log(tx);
 
-      const signature = await gnosis.getEIP712Signature(offchainSigner, {
-        baseGas: tx.baseGas.toString(),
-        data: tx.data || '0x0',
-        gasPrice: tx.gasPrice,
-        gasToken: tx.gasToken,
-        nonce: tx.nonce,
-        operation: tx.operation,
-        refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
-        safeTxGas: tx.safeTxGas.toString(),
-        to: tx.to,
-        valueInWei: tx.value,
-        safeAddress: tx.safe,
-        networkId: (await safeSdk.getChainId()).toString(),
-      });
+      // const signature = await gnosis.getEIP712Signature(offchainSigner, {
+      //   baseGas: tx.baseGas.toString(),
+      //   data: tx.data || '0x0',
+      //   gasPrice: tx.gasPrice,
+      //   gasToken: tx.gasToken,
+      //   nonce: tx.nonce,
+      //   operation: tx.operation,
+      //   refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
+      //   safeTxGas: tx.safeTxGas.toString(),
+      //   to: tx.to,
+      //   valueInWei: tx.value,
+      //   safeAddress: tx.safe,
+      //   networkId: (await safeSdk.getChainId()).toString(),
+      // });
 
-      console.log('manual signature');
-      console.log(signature);
-      console.log('gnosis UI signature');
-      console.log(tx.confirmations?.find((confirmation) => confirmation.owner == offchainSigner.address)?.signature);
+      // console.log('manual signature');
+      // console.log(signature);
+
+      const safeChainId = await safeSdk.getChainId();
+      const txDetails: gnosis.SafeTransactionData = await gnosis.getTransaction(safeChainId, tx.safeTxHash);
+
+      const transactions: SafeTransactionData[] = [
+        {
+          to: txDetails.txData.to.value,
+          value: txDetails.txData.value,
+          data: txDetails.txData.hexData || '0x00',
+          operation: txDetails.txData.operation,
+          safeTxGas: Number(txDetails.detailedExecutionInfo.safeTxGas),
+          baseGas: Number(txDetails.detailedExecutionInfo.baseGas),
+          gasPrice: Number(txDetails.detailedExecutionInfo.gasPrice),
+          gasToken: txDetails.detailedExecutionInfo.gasToken,
+          refundReceiver: txDetails.detailedExecutionInfo.refundReceiver.value,
+          nonce: txDetails.detailedExecutionInfo.nonce,
+        },
+      ];
+
+      const safeTransaction = await safeSdk.createTransaction(...transactions);
+      await safeSdk.signTransaction(safeTransaction);
+      console.log(safeTransaction.signatures.get(offchainSigner.address.toLowerCase()));
+
+      // console.log('gnosis UI signature');
+      // console.log(tx.confirmations?.find((confirmation) => confirmation.owner == offchainSigner.address)?.signature);
 
       resolve();
     } catch (err) {

@@ -52,10 +52,10 @@ function mainExecute(): Promise<void | Error> {
         return;
       }
       for (const safeQueuedTransaction of safeQueuedTransactions) {
-        if (safeQueuedTransaction.txStatus !== 'AWAITING_EXECUTION') {
-          console.log(`invalid tx status: ${safeQueuedTransaction.txStatus}`);
-          continue;
-        }
+        // if (safeQueuedTransaction.txStatus !== 'AWAITING_EXECUTION') {
+        //   console.log(`invalid tx status: ${safeQueuedTransaction.txStatus}`);
+        //   continue;
+        // }
         console.log('safeQueuedTransaction.id');
         console.log(safeQueuedTransaction.id);
         const txDetails: gnosis.SafeTransactionData = await gnosis.getTransaction(safeChainId, safeQueuedTransaction.id);
@@ -77,9 +77,21 @@ function mainExecute(): Promise<void | Error> {
         ];
 
         const safeTransaction = await safeSdk.createTransaction(...transactions);
+
+        const offchainSignatures: { signer: string; data: string }[] = [
+          {
+            signer: '0x00004498C01501939A62B7F5d8F519A8e4fFd61a',
+            data: '0xbcb8302367dcb172471be1030b422b8e3d6075c4e2ade64f2309d42e60357ca10719abf1da9095b34526ef6312a4872b29f4fd12381646fe907b42c1c27bfca920',
+          },
+        ];
+        for (const offchainsignature of offchainSignatures) {
+          console.log('offchainsignature:', offchainsignature.signer, offchainsignature.data);
+          if (offchainsignature.signer == executor.address) continue;
+          safeTransaction.addSignature(new EthSignSignature(offchainsignature.signer, offchainsignature.data));
+        }
+
         for (const confirmation of txDetails.detailedExecutionInfo.confirmations) {
-          console.log(confirmation);
-          if (confirmation.signer.value == executor.address) continue;
+          console.log('confirmation:', confirmation.signer.value, confirmation.signature);
           safeTransaction.addSignature(new EthSignSignature(confirmation.signer.value, confirmation.signature));
         }
 
