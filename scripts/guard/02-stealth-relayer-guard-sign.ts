@@ -33,9 +33,13 @@ function mainExecute(): Promise<void | Error> {
       const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterExecutor, safeAddress });
 
       const safeService = new SafeServiceClient('https://safe-transaction.rinkeby.gnosis.io');
-      const tx: SafeMultisigTransactionResponse = await safeService.getTransaction(
-        '0x254233efd244a9efb772fdd1ad4e7bc6092a3ffa1ee194433803941ff2560e77'
-      );
+      const pendingTxsResponse = await safeService.getPendingTransactions(safeAddress);
+      const pendingTxs = pendingTxsResponse.results;
+      if (pendingTxs.length == 0) return;
+      const tx = pendingTxs[0];
+      // const tx: SafeMultisigTransactionResponse = await safeService.getTransaction(
+      //   pendingTxs[0].safeTxHash
+      // );
 
       console.log(tx);
 
@@ -54,8 +58,10 @@ function mainExecute(): Promise<void | Error> {
         networkId: (await safeSdk.getChainId()).toString(),
       });
 
+      console.log('manual signature');
       console.log(signature);
-      console.log(ethers.utils.hashMessage(signature));
+      console.log('gnosis UI signature');
+      console.log(tx.confirmations?.find((confirmation) => confirmation.owner == offchainSigner.address)?.signature);
 
       resolve();
     } catch (err) {

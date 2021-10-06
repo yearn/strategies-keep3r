@@ -48,15 +48,13 @@ export const blockProtection = {
 export const vaultsRegistry = {
   mainnet: '0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804',
   polygon: '',
-  ftm: '0x7A37974EF8e0C5a5247EF8446E4Bfd7F747B475e',
-  ftm_old: '0x41679043846d1B16b44FBf6E7FE531390e5bf092',
+  ftm: '0x727fe1759430df13655ddb0731dE0D0FDE929b04',
 };
 
 export const vaultsRegistryHelper = {
   mainnet: '',
   polygon: '',
-  ftm: '0x68d2066086344e80c3d4624eF121BDB56b74D8B2',
-  ftm_old: '0x3030c9462BD9AFeCE7536B66cc75071dE687Af4A',
+  ftm: '0x8CC45f739104b3Bdb98BFfFaF2423cC0f817ccc1',
 };
 
 export const tendV2Keep3rJob = {

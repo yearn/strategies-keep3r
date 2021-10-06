@@ -42,9 +42,9 @@ const networks: NetworksUserConfig = process.env.TEST
         accounts: [(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
         tags: ['production'],
       },
-      fantom: {
-        url: getNodeUrl('fantom'),
-        accounts: [(process.env.FANTOM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+      ftm: {
+        url: getNodeUrl('ftm'),
+        accounts: [(process.env.FTM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
         tags: ['production'],
       },
     };
