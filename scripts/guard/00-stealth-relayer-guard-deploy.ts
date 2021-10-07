@@ -3,7 +3,12 @@ import { run, ethers } from 'hardhat';
 import * as contracts from '../../utils/contracts';
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm('Do you wish to stealthRelayerGuard contracts?');
+const { Input } = require('enquirer');
+const prompt = new Confirm({ message: 'Do you wish to stealthRelayerGuard contracts?' });
+const safeInputPrompt = new Input({
+  message: 'Paste gnosis safe address',
+  initial: '0x...',
+});
 
 async function main() {
   await run('compile');
@@ -14,15 +19,16 @@ function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     const networkName = 'rinkeby';
-    const safe = '0x23DC650A7760cA37CafD14AF5f1e0ab62cE50FA4';
     console.log('using address:', owner.address, 'on', networkName);
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
+          const safeAddress = await safeInputPrompt.run();
+          if (safeAddress.length != 42) throw Error('invalid safeAddress length');
           const StealthRelayerGuard: ContractFactory = await ethers.getContractFactory('StealthRelayerGuard');
 
-          console.log('StealthRelayerGuard:', safe, contracts.stealthRelayer[networkName]);
-          const stealthRelayerGuard = await StealthRelayerGuard.deploy(safe, contracts.stealthRelayer[networkName]);
+          console.log('StealthRelayerGuard:', safeAddress, contracts.stealthRelayer[networkName]);
+          const stealthRelayerGuard = await StealthRelayerGuard.deploy(safeAddress, contracts.stealthRelayer[networkName]);
           console.log('StealthRelayerGuard address:', stealthRelayerGuard.address);
           console.log(`PLEASE: change utils/contracts.ts stealthRelayerGuard ${networkName} address to: ${stealthRelayerGuard.address}`);
           console.log();
