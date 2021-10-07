@@ -18,7 +18,12 @@ import * as contracts from '../../utils/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm({ message: 'Do you wish to get queued transactions signatures from safe?' });
+const { Input } = require('enquirer');
+const prompt = new Confirm({ message: 'Do you wish to get queued transactions signatures from safe and execute?' });
+const safeInputPrompt = new Input({
+  message: 'Paste gnosis safe address',
+  initial: '0x...',
+});
 
 async function main() {
   await run('compile');
@@ -31,10 +36,12 @@ function mainExecute(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [executor] = await ethers.getSigners();
     const networkName = 'rinkeby';
-    const safeAddress = '0x23DC650A7760cA37CafD14AF5f1e0ab62cE50FA4';
     console.log('using address:', executor.address, 'on', networkName);
 
     try {
+      const safeAddress = await safeInputPrompt.run();
+      if (safeAddress.length != 42) throw Error('invalid safeAddress length');
+
       let executorNonce = ethers.BigNumber.from(await executor.getTransactionCount());
 
       const safeContract = await ethers.getContractAt('GnosisSafe', safeAddress);

@@ -5,7 +5,7 @@ const { Confirm } = require('enquirer');
 const { Input } = require('enquirer');
 const confirmPrompt = new Confirm({ message: 'Do you wish to sign a gnosis safe txHash?' });
 const safeInputPrompt = new Input({
-  message: 'Paste msig address',
+  message: 'Paste gnosis safe address',
   initial: '0x...',
 });
 const hashInputPrompt = new Input({
