@@ -1,5 +1,6 @@
 import { run, ethers } from 'hardhat';
 import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk';
+import { NETWORK_ID_NAMES } from '@utils/network';
 
 const { Confirm } = require('enquirer');
 const { Input } = require('enquirer');
@@ -23,7 +24,10 @@ async function main() {
 function mainExecute(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [offchainSigner] = await ethers.getSigners();
-    const networkName = 'rinkeby';
+    const chainId = (await ethers.provider.getNetwork()).chainId;
+    const networkName = NETWORK_ID_NAMES[chainId];
+    if (!networkName) throw Error(`chainId: ${chainId} is not supported`);
+    console.log('using address:', offchainSigner.address, 'on', networkName);
     console.log('using address:', offchainSigner.address, 'on', networkName);
 
     try {

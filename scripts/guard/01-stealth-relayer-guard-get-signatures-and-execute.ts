@@ -16,6 +16,7 @@ import { makeid } from '../../utils/hash';
 import * as gnosis from '../../utils/gnosis';
 import * as contracts from '../../utils/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
+import { NETWORK_ID_NAMES } from '@utils/network';
 
 const { Confirm } = require('enquirer');
 const { Input } = require('enquirer');
@@ -35,9 +36,10 @@ async function main() {
 function mainExecute(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [executor] = await ethers.getSigners();
-    const networkName = 'rinkeby';
+    const chainId = (await ethers.provider.getNetwork()).chainId;
+    const networkName = NETWORK_ID_NAMES[chainId];
+    if (!networkName) throw Error(`chainId: ${chainId} is not supported`);
     console.log('using address:', executor.address, 'on', networkName);
-
     try {
       const safeAddress = await safeInputPrompt.run();
       if (safeAddress.length != 42) throw Error('invalid safeAddress length');
@@ -113,7 +115,8 @@ function mainExecute(): Promise<void | Error> {
         const stealthHash = ethers.utils.solidityKeccak256(['string'], [makeid(32)]);
         const provider: Provider = executor.provider as Provider;
 
-        const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer[networkName]);
+        const stealthRelayerAddress: string = contracts.stealthRelayer[networkName] as string;
+        const stealthRelayer = await ethers.getContractAt('IStealthRelayer', stealthRelayerAddress);
         const pendingBlock = await provider.getBlock('latest');
         const blockGasLimit = BigNumber.from(pendingBlock.gasLimit);
 
