@@ -10,7 +10,7 @@ import '../interfaces/gnosis/IGnosisSafe.sol';
 import '../interfaces/utils/IGovernableAndManageable.sol';
 import '../interfaces/stealth/IStealthRelayer.sol';
 
-interface IStealthRelayerGuard is IGuard, IGovernableAndManageable {
+interface IStealthSafeGuard is IGuard, IGovernableAndManageable {
   error NotAuthorized();
   error ZeroAddress();
   error InvalidExecutor();
@@ -27,7 +27,7 @@ interface IStealthRelayerGuard is IGuard, IGovernableAndManageable {
   function setOverrideGuardChecks(bool _overrideGuardChecks) external;
 }
 
-contract StealthRelayerGuard is UtilsReady, Manageable, OnlyStealthRelayer, IStealthRelayerGuard {
+contract StealthSafeGuard is UtilsReady, Manageable, OnlyStealthRelayer, IStealthSafeGuard {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet internal _executors;

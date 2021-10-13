@@ -70,7 +70,7 @@ export const betaTendV2Keep3rJob: ContractChainAddress = {
   mainnet: '0xf72D7E44ec3F79379912B8d0f661bE954a101159',
 };
 
-export const stealthRelayerGuard: ContractChainAddress = {
+export const stealthSafeGuard: ContractChainAddress = {
   mainnet: '',
   rinkeby: '0xC190B246e9fe7026240e464bf28c0ba645CD81c3',
 };

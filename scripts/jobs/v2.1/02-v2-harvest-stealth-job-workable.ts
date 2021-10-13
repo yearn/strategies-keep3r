@@ -20,7 +20,10 @@ function promptAndSubmit(): Promise<void | Error> {
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
-          const harvestV2Keep3rStealthJob = await ethers.getContractAt('HarvestV2Keep3rStealthJob', contracts.harvestV2Keep3rStealthJob.mainnet);
+          const harvestV2Keep3rStealthJob = await ethers.getContractAt(
+            'HarvestV2Keep3rStealthJob',
+            contracts.harvestV2Keep3rStealthJob.mainnet as string
+          );
 
           const strategies = await harvestV2Keep3rStealthJob.callStatic.strategies();
           console.log('strategies:', strategies);
