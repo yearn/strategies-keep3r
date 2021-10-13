@@ -4,7 +4,7 @@ import * as contracts from '../../utils/contracts';
 
 const { Confirm } = require('enquirer');
 const { Input } = require('enquirer');
-const prompt = new Confirm({ message: 'Do you wish to stealthRelayerGuard contracts?' });
+const prompt = new Confirm({ message: 'Do you wish to stealthSafeGuard contracts?' });
 const safeInputPrompt = new Input({
   message: 'Paste gnosis safe address',
   initial: '0x...',
@@ -25,12 +25,12 @@ function promptAndSubmit(): Promise<void | Error> {
         try {
           const safeAddress = await safeInputPrompt.run();
           if (safeAddress.length != 42) throw Error('invalid safeAddress length');
-          const StealthRelayerGuard: ContractFactory = await ethers.getContractFactory('StealthRelayerGuard');
+          const StealthSafeGuard: ContractFactory = await ethers.getContractFactory('StealthSafeGuard');
 
-          console.log('StealthRelayerGuard:', safeAddress, contracts.stealthRelayer[networkName]);
-          const stealthRelayerGuard = await StealthRelayerGuard.deploy(safeAddress, contracts.stealthRelayer[networkName]);
-          console.log('StealthRelayerGuard address:', stealthRelayerGuard.address);
-          console.log(`PLEASE: change utils/contracts.ts stealthRelayerGuard ${networkName} address to: ${stealthRelayerGuard.address}`);
+          console.log('StealthSafeGuard:', safeAddress, contracts.stealthRelayer[networkName]);
+          const stealthSafeGuard = await StealthSafeGuard.deploy(safeAddress, contracts.stealthRelayer[networkName]);
+          console.log('StealthSafeGuard address:', stealthSafeGuard.address);
+          console.log(`PLEASE: change utils/contracts.ts stealthSafeGuard ${networkName} address to: ${stealthSafeGuard.address}`);
           console.log();
 
           resolve();
