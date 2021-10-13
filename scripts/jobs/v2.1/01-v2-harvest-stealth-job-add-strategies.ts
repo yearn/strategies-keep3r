@@ -36,7 +36,7 @@ function promptAndSubmit(): Promise<void | Error> {
         try {
           const harvestV2Keep3rStealthJob = await ethers.getContractAt(
             'HarvestV2Keep3rStealthJob',
-            contracts.harvestV2Keep3rStealthJob.mainnet,
+            contracts.harvestV2Keep3rStealthJob.mainnet as string,
             signer
           );
 
@@ -75,21 +75,29 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log(strategiesToAdd);
           if (!(await confirm.run())) return;
 
+          const gasLimit = 200_000;
           await harvestV2Keep3rStealthJob.callStatic.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
             strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
-            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
+            strategiesToAdd.map((strategy) => strategy.costPair), // address _costPair
+            {
+              gasLimit,
+            }
           );
+
           await harvestV2Keep3rStealthJob.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
             strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
-            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
+            strategiesToAdd.map((strategy) => strategy.costPair), // address _costPair
+            {
+              gasLimit,
+            }
           );
 
           resolve();
-        } catch (err) {
+        } catch (err: any) {
           reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
         }
       } else {
