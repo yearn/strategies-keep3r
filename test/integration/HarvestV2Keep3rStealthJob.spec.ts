@@ -91,8 +91,8 @@ describe('HarvestV2Keep3rStealthJob', () => {
     console.log({ workable });
 
     // Stealth contracts and setup
-    const stealthVault = await ethers.getContractAt('IStealthVault', contracts.stealthVault.mainnet, deployer);
-    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet, deployer);
+    const stealthVault = await ethers.getContractAt('IStealthVault', contracts.stealthVault.mainnet as string, deployer);
+    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet as string, deployer);
     // Set job in stealth relayer
     await stealthRelayer.addJob(harvestV2Keep3rStealthJob.address);
 
