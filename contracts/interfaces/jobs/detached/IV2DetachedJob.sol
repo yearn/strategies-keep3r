@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
-import '../IKeep3rJob.sol';
 
-interface IV2DetachedJob is IKeep3rJob {
+interface IV2DetachedJob {
   error MultiplierExceedsMax();
   error NotZero();
   error StrategyAlreadyAdded();

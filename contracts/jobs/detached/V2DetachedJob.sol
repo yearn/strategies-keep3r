@@ -18,10 +18,6 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   address public immutable baseFeeOracle;
 
-  uint256 public constant PRECISION = 1_000;
-  uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
-  uint256 public override rewardMultiplier = 850;
-
   IV2Keeper public V2Keeper;
 
   address public yOracle;
@@ -60,16 +56,6 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
 
   function _setYOracle(address _yOracle) internal {
     yOracle = _yOracle;
-  }
-
-  function setRewardMultiplier(uint256 _rewardMultiplier) external override onlyGovernorOrMechanic {
-    _setRewardMultiplier(_rewardMultiplier);
-    emit SetRewardMultiplier(_rewardMultiplier);
-  }
-
-  function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-    if (_rewardMultiplier > MAX_REWARD_MULTIPLIER) revert MultiplierExceedsMax();
-    rewardMultiplier = _rewardMultiplier;
   }
 
   // Setters
