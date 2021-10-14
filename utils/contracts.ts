@@ -79,3 +79,13 @@ export const multicall2: ContractChainAddress = {
   mainnet: '',
   ftm: '0x6cAfA5f64476769aAEc7c0Ae8D8E14c2a77272a2',
 };
+
+export const yOracle: ContractChainAddress = {
+  mainnet: '0x0000000000000000000000000000000000000000',
+  ftm: '0x0000000000000000000000000000000000000000',
+};
+
+export const baseFeeOracle: ContractChainAddress = {
+  mainnet: '0xf8d0ec04e94296773ce20efbeea82e76220cd549',
+  ftm: '0x29975c3B15E4B23A39197bfAF7195BeCd386Da6c',
+};
