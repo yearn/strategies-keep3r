@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.8;
+pragma solidity >=0.8.4 <0.9.0;
 
 interface IV2DetachedJob {
   error MultiplierExceedsMax();
