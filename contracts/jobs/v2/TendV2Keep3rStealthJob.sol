@@ -47,7 +47,7 @@ contract TendV2Keep3rStealthJob is V2Keep3rStealthJob {
 
   function _work(address _strategy) internal override {
     lastWorkAt[_strategy] = block.timestamp;
-    V2Keeper.tend(_strategy);
+    IV2Keeper(v2Keeper).tend(_strategy);
   }
 
   // Keep3r actions

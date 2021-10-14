@@ -19,6 +19,8 @@ interface IV2Keep3rJob is IKeep3rJob {
   event ForceWorked(address _strategy);
 
   // Getters
+  function v2Keeper() external view returns (address _v2Keeper);
+
   function fastGasOracle() external view returns (address _fastGasOracle);
 
   function strategies() external view returns (address[] memory);

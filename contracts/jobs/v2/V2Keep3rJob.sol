@@ -24,7 +24,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
   uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
   uint256 public override rewardMultiplier = 850;
 
-  IV2Keeper public V2Keeper;
+  address public override v2Keeper;
 
   address public yOracle;
 
@@ -53,7 +53,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
   ) MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
     _setYOracle(_yOracle);
     _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
-    V2Keeper = IV2Keeper(_v2Keeper);
+    v2Keeper = _v2Keeper;
     if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
   }
 
@@ -63,7 +63,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
   }
 
   function setV2Keep3r(address _v2Keeper) external override onlyGovernor {
-    V2Keeper = IV2Keeper(_v2Keeper);
+    v2Keeper = _v2Keeper;
   }
 
   function setYOracle(address _yOracle) external override onlyGovernor {
