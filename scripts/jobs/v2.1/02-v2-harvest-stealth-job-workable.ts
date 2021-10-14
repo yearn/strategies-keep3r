@@ -29,9 +29,16 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log('strategies:', strategies);
           for (const strategy of strategies) {
             try {
+              const strategyContract = await ethers.getContractAt('IBaseStrategy', strategy);
+              const strategyKeeper = await strategyContract.keeper();
+              if (strategyKeeper != contracts.v2Keeper.mainnet) {
+                console.log(strategy, 'keeper mismatch:', strategyKeeper);
+                continue;
+              }
               const workableStrategy = await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
               console.log(strategy, 'workable:', workableStrategy);
             } catch (error) {
+              console.log(strategy, 'error:');
               console.log(error);
             }
           }

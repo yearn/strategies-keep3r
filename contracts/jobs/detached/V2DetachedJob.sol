@@ -18,7 +18,7 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   address public immutable baseFeeOracle;
 
-  IV2Keeper public V2Keeper;
+  address public override v2Keeper;
 
   address public yOracle;
 
@@ -42,12 +42,12 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   ) MachineryReady(_mechanicsRegistry) {
     baseFeeOracle = _baseFeeOracle;
     _setYOracle(_yOracle);
-    V2Keeper = IV2Keeper(_v2Keeper);
+    v2Keeper = _v2Keeper;
     if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
   }
 
   function setV2Keep3r(address _v2Keeper) external override onlyGovernor {
-    V2Keeper = IV2Keeper(_v2Keeper);
+    v2Keeper = _v2Keeper;
   }
 
   function setYOracle(address _yOracle) external override onlyGovernor {
