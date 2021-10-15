@@ -213,8 +213,8 @@ function mainExecute(): Promise<void | Error> {
       }
 
       resolve();
-    } catch (err) {
-      reject(`Error while getting signatures from safe: ${(err as any).message}`);
+    } catch (err: any) {
+      reject(`Error while getting signatures from safe: ${err.message}`);
     }
   });
 }
