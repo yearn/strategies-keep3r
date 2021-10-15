@@ -40,8 +40,8 @@ function mainExecute(): Promise<void | Error> {
       const signature = await safeSdk.signTransactionHash(safeTxHash);
       console.log({ signer: signature.signer, data: signature.data });
       resolve();
-    } catch (err) {
-      reject(`Error while signing gnosis safe txHash: ${(err as any).message}`);
+    } catch (err: any) {
+      reject(`Error while signing gnosis safe txHash: ${err.message}`);
     }
   });
 }

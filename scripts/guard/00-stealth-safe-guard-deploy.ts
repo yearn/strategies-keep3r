@@ -1,3 +1,4 @@
+import { NETWORK_ID_NAMES } from '@utils/network';
 import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
 import * as contracts from '../../utils/contracts';
@@ -18,7 +19,9 @@ async function main() {
 function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
-    const networkName = 'rinkeby';
+    const chainId = (await ethers.provider.getNetwork()).chainId;
+    const networkName = NETWORK_ID_NAMES[chainId];
+    if (!networkName) throw Error(`chainId: ${chainId} is not supported`);
     console.log('using address:', owner.address, 'on', networkName);
     prompt.run().then(async (answer: any) => {
       if (answer) {
@@ -34,8 +37,8 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log();
 
           resolve();
-        } catch (err) {
-          reject(`Error while deploying v2 keep3r job contracts: ${(err as any).message}`);
+        } catch (err: any) {
+          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
         }
       } else {
         console.error('Aborted!');
