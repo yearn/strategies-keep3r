@@ -71,3 +71,13 @@ export const baseFeeOracle = {
   mainnet: '0xf8d0ec04e94296773ce20efbeea82e76220cd549',
   ftm: '0x29975c3B15E4B23A39197bfAF7195BeCd386Da6c',
 };
+
+export const tendV2DetachedJob = {
+  mainnet: '',
+  ftm: '',
+};
+
+export const harvestV2DetachedJob = {
+  mainnet: '',
+  ftm: '',
+};
