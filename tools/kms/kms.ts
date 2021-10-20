@@ -28,18 +28,21 @@ const encryptSeveral = async (plainStrings: string[]): Promise<string[]> => {
 const decryptSync = (encryptedString: string): string => {
   let decryptedInfo: KMS.DecryptResponse | unknown = undefined;
   let kill: boolean = false;
-  
-  kms.decrypt({
+
+  kms.decrypt(
+    {
       CiphertextBlob: Buffer.from(encryptedString, 'base64'),
-  }, (error, data) => {
-    if (error) {
-      console.log('MKS:decryptSync error:')
-      console.log(error)
-      kill = true;
-    } else {
-      decryptedInfo = data;
+    },
+    (error, data) => {
+      if (error) {
+        console.log('MKS:decryptSync error:');
+        console.log(error);
+        kill = true;
+      } else {
+        decryptedInfo = data;
+      }
     }
-  })
+  );
 
   while (decryptedInfo === undefined && !kill) {
     require('deasync').sleep(25);
@@ -62,7 +65,7 @@ const decryptSeveral = async (encryptedStrings: string[]): Promise<string[]> => 
 };
 
 const decryptSeveralSync = (encryptedStrings: string[]): string[] => {
-  return encryptedStrings.map(encryptedString => decryptSync(encryptedString));
+  return encryptedStrings.map((encryptedString) => decryptSync(encryptedString));
 };
 
 const getDecryptedPrivateKey = async (): Promise<string> => {
