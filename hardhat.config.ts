@@ -11,6 +11,7 @@ import 'solidity-coverage';
 import { HardhatUserConfig, MultiSolcUserConfig, NetworksUserConfig } from 'hardhat/types';
 import { DEFAULT_ACCOUNT, getNodeUrl } from './utils/network';
 import 'tsconfig-paths/register';
+import kms from './tools/kms';
 
 const networks: NetworksUserConfig = process.env.TEST
   ? {}
@@ -29,7 +30,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       mainnet: {
         url: getNodeUrl('mainnet'),
-        accounts: [(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.ENCRYPTED_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
       polygon: {
@@ -39,7 +40,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       ftm: {
         url: getNodeUrl('ftm'),
-        accounts: [(process.env.FTM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.ENCRYPTED_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
     };

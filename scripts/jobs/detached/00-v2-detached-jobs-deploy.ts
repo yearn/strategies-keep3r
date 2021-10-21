@@ -45,7 +45,6 @@ function promptAndSubmit(): Promise<void | Error> {
             'HarvestV2DetachedJob:',
             contracts.baseFeeOracle[networkName], // address _baseFeeOracle,
             contracts.mechanicsRegistry[networkName], // address _mechanicsRegistry,
-            contracts.stealthRelayer.mainnet, // address _stealthRelayer
             contracts.yOracle[networkName], // address _yOracle
             contracts.v2Keeper[networkName], // address _v2Keeper
             6 * 60 * 60 // uint256 _workCooldown // 6 hours
@@ -53,7 +52,6 @@ function promptAndSubmit(): Promise<void | Error> {
           const harvestV2DetachedJob = await HarvestV2DetachedJob.deploy(
             contracts.baseFeeOracle[networkName], // address _baseFeeOracle,
             contracts.mechanicsRegistry[networkName], // address _mechanicsRegistry,
-            contracts.stealthRelayer.mainnet, // address _stealthRelayer
             contracts.yOracle[networkName], // address _yOracle
             contracts.v2Keeper[networkName], // address _v2Keeper
             6 * 60 * 60 // uint256 _workCooldown // 6 hours
