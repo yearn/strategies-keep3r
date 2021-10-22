@@ -25,7 +25,7 @@ const networks: NetworksUserConfig = process.env.TEST
       localhost: {
         url: getNodeUrl('localhost'),
         live: false,
-        accounts: [(process.env.LOCAL_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.LOCAL_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['local'],
       },
       mainnet: {
@@ -35,7 +35,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       polygon: {
         url: getNodeUrl('polygon'),
-        accounts: [(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
       ftm: {

@@ -2,16 +2,16 @@
 
 pragma solidity >=0.8.4 <0.9.0;
 
-import './V2DetachedJob.sol';
+import './V2DetachedGaslessJob.sol';
 
-contract TendV2DetachedJob is V2DetachedJob {
+contract TendV2DetachedGaslessJob is V2DetachedGaslessJob {
   constructor(
     address _mechanicsRegistry,
     address _yOracle,
     address _v2Keeper,
     uint256 _workCooldown
   )
-    V2DetachedJob(_mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
+    V2DetachedGaslessJob(_mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
   {}
 
   function workable(address _strategy) external view override returns (bool) {

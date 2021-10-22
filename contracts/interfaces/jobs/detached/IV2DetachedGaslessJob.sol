@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.4 <0.9.0;
 
-interface IV2DetachedJob {
+interface IV2DetachedGaslessJob {
   error MultiplierExceedsMax();
   error NotZero();
   error StrategyAlreadyAdded();
   error StrategyNotAdded();
-  error RequiredAmountsDifferentLength();
+  error ParametersDifferentLength();
   error NotWorkable();
 
   // Setters
-  event StrategyAdded(address _strategy, uint256 _requiredAmount);
-  event StrategyModified(address _strategy, uint256 _requiredAmount);
+  event StrategyAdded(address _strategy);
+  event StrategyModified(address _strategy);
   event StrategyRemoved(address _strategy);
 
   // Actions by Keeper
@@ -34,21 +34,15 @@ interface IV2DetachedJob {
 
   function addStrategies(
     address[] calldata _strategy,
-    uint256[] calldata _requiredAmount,
     address[] calldata _costTokens,
     address[] calldata _costPairs
   ) external;
 
   function addStrategy(
     address _strategy,
-    uint256 _requiredAmount,
     address _costToken,
     address _costPair
   ) external;
-
-  function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external;
-
-  function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external;
 
   function updateCostTokenAndPair(
     address _strategy,
@@ -59,7 +53,7 @@ interface IV2DetachedJob {
   function removeStrategy(address _strategy) external;
 
   // Keeper actions
-  function work(address _strategy) external returns (uint256 _credits);
+  function work(address _strategy) external;
 
   // Mechanics keeper bypass
   function forceWork(address _strategy) external;

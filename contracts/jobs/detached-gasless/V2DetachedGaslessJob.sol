@@ -6,17 +6,16 @@ import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol';
 
 import '../../interfaces/jobs/v2/IV2Keeper.sol';
-import '../../interfaces/jobs/detached/IV2DetachedJob.sol';
+import '../../interfaces/jobs/detached/IV2DetachedGaslessJob.sol';
 
 import '../../interfaces/yearn/IBaseStrategy.sol';
 import '../../interfaces/oracle/IYOracle.sol';
 import '../../interfaces/utils/IBaseFee.sol';
 
-abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
+abstract contract V2DetachedGaslessJob is MachineryReady, IV2DetachedGaslessJob {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-  address public immutable baseFeeOracle;
 
   IV2Keeper public V2Keeper;
 
@@ -24,7 +23,6 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
 
   EnumerableSet.AddressSet internal _availableStrategies;
 
-  mapping(address => uint256) public requiredAmount;
   mapping(address => uint256) public lastWorkAt;
 
   // custom cost oracle calcs
@@ -34,13 +32,11 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   uint256 public workCooldown;
 
   constructor(
-    address _baseFeeOracle,
     address _mechanicsRegistry,
     address _yOracle,
     address _v2Keeper,
     uint256 _workCooldown
   ) MachineryReady(_mechanicsRegistry) {
-    baseFeeOracle = _baseFeeOracle;
     _setYOracle(_yOracle);
     V2Keeper = IV2Keeper(_v2Keeper);
     if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
@@ -71,52 +67,31 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
   // Governor
   function addStrategies(
     address[] calldata _strategies,
-    uint256[] calldata _requiredAmounts,
     address[] calldata _costTokens,
     address[] calldata _costPairs
   ) external override onlyGovernorOrMechanic {
-    if (_strategies.length != _requiredAmounts.length) revert RequiredAmountsDifferentLength();
+    if (_strategies.length != _costTokens.length) revert ParametersDifferentLength();
     for (uint256 i; i < _strategies.length; i++) {
-      _addStrategy(_strategies[i], _requiredAmounts[i], _costTokens[i], _costPairs[i]);
+      _addStrategy(_strategies[i], _costTokens[i], _costPairs[i]);
     }
   }
 
   function addStrategy(
     address _strategy,
-    uint256 _requiredAmount,
     address _costToken,
     address _costPair
   ) external override onlyGovernorOrMechanic {
-    _addStrategy(_strategy, _requiredAmount, _costToken, _costPair);
+    _addStrategy(_strategy, _costToken, _costPair);
   }
 
   function _addStrategy(
     address _strategy,
-    uint256 _requiredAmount,
     address _costToken,
     address _costPair
   ) internal {
-    _setRequiredAmount(_strategy, _requiredAmount);
     _setCostTokenAndPair(_strategy, _costToken, _costPair);
-    emit StrategyAdded(_strategy, _requiredAmount);
+    emit StrategyAdded(_strategy);
     if (!_availableStrategies.add(_strategy)) revert StrategyAlreadyAdded();
-  }
-
-  function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
-    if (_strategies.length != _requiredAmounts.length) revert RequiredAmountsDifferentLength();
-    for (uint256 i; i < _strategies.length; i++) {
-      _updateRequiredAmount(_strategies[i], _requiredAmounts[i]);
-    }
-  }
-
-  function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external override onlyGovernorOrMechanic {
-    _updateRequiredAmount(_strategy, _requiredAmount);
-  }
-
-  function _updateRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
-    if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
-    _setRequiredAmount(_strategy, _requiredAmount);
-    emit StrategyModified(_strategy, _requiredAmount);
   }
 
   function updateCostTokenAndPair(
@@ -138,13 +113,8 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
 
   function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
     if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
-    delete requiredAmount[_strategy];
     _availableStrategies.remove(_strategy);
     emit StrategyRemoved(_strategy);
-  }
-
-  function _setRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
-    requiredAmount[_strategy] = _requiredAmount;
   }
 
   function _setCostTokenAndPair(
@@ -169,14 +139,6 @@ abstract contract V2DetachedJob is MachineryReady, IV2DetachedJob {
     if (!_availableStrategies.contains(_strategy)) revert StrategyNotAdded();
     if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy] + workCooldown) return true;
     return false;
-  }
-
-  // Get eth costs
-  function _getCallCosts(address _strategy) internal view returns (uint256 _callCost) {
-    if (requiredAmount[_strategy] == 0) return 0;
-    uint256 _ethCost = requiredAmount[_strategy] * IBaseFee(baseFeeOracle).basefee_global();
-    if (costToken[_strategy] == address(0)) return _ethCost;
-    return IYOracle(yOracle).getAmountOut(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
   }
 
   // Keep3r actions

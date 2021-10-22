@@ -4,7 +4,7 @@ pragma solidity >=0.8.4 <0.9.0;
 
 import './V2DetachedJob.sol';
 
-contract HarvestV2DetachedJob is V2DetachedJob {
+contract TendV2DetachedJob is V2DetachedJob {
   constructor(
     address _baseFeeOracle,
     address _mechanicsRegistry,
@@ -21,12 +21,12 @@ contract HarvestV2DetachedJob is V2DetachedJob {
 
   function _workable(address _strategy) internal view override returns (bool) {
     if (!super._workable(_strategy)) return false;
-    return IBaseStrategy(_strategy).harvestTrigger(_getCallCosts(_strategy));
+    return IBaseStrategy(_strategy).tendTrigger(_getCallCosts(_strategy));
   }
 
   function _work(address _strategy) internal override {
     lastWorkAt[_strategy] = block.timestamp;
-    V2Keeper.harvest(_strategy);
+    V2Keeper.tend(_strategy);
   }
 
   // Keep3r actions
