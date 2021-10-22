@@ -30,7 +30,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       mainnet: {
         url: getNodeUrl('mainnet'),
-        accounts: kms.decryptSeveralSync([(process.env.ENCRYPTED_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
+        accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
       polygon: {
@@ -40,7 +40,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       ftm: {
         url: getNodeUrl('ftm'),
-        accounts: kms.decryptSeveralSync([(process.env.ENCRYPTED_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
+        accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
     };
