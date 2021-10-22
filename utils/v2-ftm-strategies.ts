@@ -15,19 +15,19 @@ export const v2FtmHarvestStrategies: v2Strategy[] = [
     name: 'WFTM',
     amount: 2_000_000,
     added: true,
-    address: '0x5920892f23967728E16135c21aB8BeEC8C548927',
+    address: '0x695a4a6e5888934828cb97a3a7adbfc71a70922d',
   },
   {
     name: 'MIM',
     amount: 2_000_000,
     added: true,
-    address: '0xf6ee87BedC9fE2c99Fed5AF90794806F53cF9f11',
+    address: '0xd0d1f041f93c0ff1091457618e529610c67a76de',
   },
   {
     name: 'USDC',
     amount: 2_000_000,
-    added: true,
-    address: '0xF39E31D1bC0D43A0eb755f758d01fd70bECee471',
+    added: false,
+    address: '',
   },
   {
     name: 'DAI',

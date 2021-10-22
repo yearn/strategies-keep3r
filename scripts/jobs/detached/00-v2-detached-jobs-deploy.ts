@@ -24,14 +24,12 @@ function promptAndSubmit(): Promise<void | Error> {
 
           console.log(
             'TendV2DetachedJob:',
-            contracts.baseFeeOracle[networkName], // address _baseFeeOracle,
             contracts.mechanicsRegistry[networkName], // address _mechanicsRegistry,
             contracts.yOracle[networkName], // address _yOracle,
             contracts.v2Keeper[networkName], // address _v2Keeper,
             60 * 5 // 5 minutes // uint256 _workCooldown
           );
           const tendV2DetachedJob = await TendV2DetachedJob.deploy(
-            contracts.baseFeeOracle[networkName],
             contracts.mechanicsRegistry[networkName],
             contracts.yOracle[networkName],
             contracts.v2Keeper[networkName],
@@ -43,14 +41,12 @@ function promptAndSubmit(): Promise<void | Error> {
 
           console.log(
             'HarvestV2DetachedJob:',
-            contracts.baseFeeOracle[networkName], // address _baseFeeOracle,
             contracts.mechanicsRegistry[networkName], // address _mechanicsRegistry,
             contracts.yOracle[networkName], // address _yOracle
             contracts.v2Keeper[networkName], // address _v2Keeper
             6 * 60 * 60 // uint256 _workCooldown // 6 hours
           );
           const harvestV2DetachedJob = await HarvestV2DetachedJob.deploy(
-            contracts.baseFeeOracle[networkName], // address _baseFeeOracle,
             contracts.mechanicsRegistry[networkName], // address _mechanicsRegistry,
             contracts.yOracle[networkName], // address _yOracle
             contracts.v2Keeper[networkName], // address _v2Keeper
