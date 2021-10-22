@@ -62,7 +62,6 @@ function promptAndSubmit(): Promise<void | Error> {
             .map((strategy) => ({
               name: strategy.name,
               address: strategy.address,
-              amount: strategy.amount,
               costToken: strategy.costToken ? strategy.costToken : ZERO_ADDRESS,
               costPair: strategy.costPair ? strategy.costPair : ZERO_ADDRESS,
             }));
@@ -73,13 +72,11 @@ function promptAndSubmit(): Promise<void | Error> {
 
           await harvestV2DetachedJob.callStatic.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
-            strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
             strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
           );
           await harvestV2DetachedJob.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
-            strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
             strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
           );

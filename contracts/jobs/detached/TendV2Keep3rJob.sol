@@ -6,13 +6,12 @@ import './V2DetachedJob.sol';
 
 contract TendV2DetachedJob is V2DetachedJob {
   constructor(
-    address _baseFeeOracle,
     address _mechanicsRegistry,
     address _yOracle,
     address _v2Keeper,
     uint256 _workCooldown
   )
-    V2DetachedJob(_baseFeeOracle, _mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
+    V2DetachedJob(_mechanicsRegistry, _yOracle, _v2Keeper, _workCooldown) // solhint-disable-next-line no-empty-blocks
   {}
 
   function workable(address _strategy) external view override returns (bool) {
@@ -21,7 +20,7 @@ contract TendV2DetachedJob is V2DetachedJob {
 
   function _workable(address _strategy) internal view override returns (bool) {
     if (!super._workable(_strategy)) return false;
-    return IBaseStrategy(_strategy).tendTrigger(_getCallCosts(_strategy));
+    return IBaseStrategy(_strategy).tendTrigger(1);
   }
 
   function _work(address _strategy) internal override {
@@ -30,7 +29,7 @@ contract TendV2DetachedJob is V2DetachedJob {
   }
 
   // Keep3r actions
-  function work(address _strategy) external override notPaused returns (uint256 _credits) {
+  function work(address _strategy) external override notPaused onlyGovernorOrMechanic {
     _workInternal(_strategy);
   }
 }

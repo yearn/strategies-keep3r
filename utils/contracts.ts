@@ -69,15 +69,15 @@ export const yOracle = {
 
 export const baseFeeOracle = {
   mainnet: '0xf8d0ec04e94296773ce20efbeea82e76220cd549',
-  ftm: '0x29975c3B15E4B23A39197bfAF7195BeCd386Da6c',
+  ftm: '',
 };
 
 export const tendV2DetachedJob = {
   mainnet: '',
-  ftm: '0x43c95794ba13edd26857E80cDC605a1C2Bc8b453',
+  ftm: '0xaB4b34e69Ae8599361709B0EC4A6dA539eFd7Fb8',
 };
 
 export const harvestV2DetachedJob = {
   mainnet: '',
-  ftm: '0x29D0957D4dd48Ec467d8c31E6EC3e793B9562ef0',
+  ftm: '0x39cAcdb557CA1C4a6555E00203B4a00B1c1a94f8',
 };

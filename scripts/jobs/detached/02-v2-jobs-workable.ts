@@ -27,7 +27,8 @@ function promptAndSubmit(): Promise<void | Error> {
               const workable = await tendV2DetachedJob.callStatic.workable(strategy);
               console.log(strategy, 'workable:', workable);
             } catch (error) {
-              console.log(error);
+              console.log(strategy, 'workable error');
+              // console.log(error);
             }
           }
 
@@ -36,10 +37,11 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log('harvestV2DetachedJob strategies:', strategies);
           for (const strategy of strategies) {
             try {
-              const workable = await harvestV2DetachedJob.callStatic.workable(strategy);
+              const workable = await harvestV2DetachedJob.workable(strategy);
               console.log(strategy, 'workable:', workable);
             } catch (error) {
-              console.log(error);
+              console.log(strategy, 'workable error');
+              // console.log(error);
             }
           }
 
