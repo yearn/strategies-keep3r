@@ -59,7 +59,7 @@ interface IV2DetachedJob {
   function removeStrategy(address _strategy) external;
 
   // Keeper actions
-  function work(address _strategy) external returns (uint256 _credits);
+  function work(address _strategy) external;
 
   // Mechanics keeper bypass
   function forceWork(address _strategy) external;
