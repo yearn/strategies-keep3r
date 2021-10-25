@@ -61,3 +61,23 @@ export const tendV2Keep3rJob = {
 export const betaTendV2Keep3rJob = {
   mainnet: '0xf72D7E44ec3F79379912B8d0f661bE954a101159',
 };
+
+export const yOracle = {
+  mainnet: '0x0000000000000000000000000000000000000000',
+  ftm: '0x0000000000000000000000000000000000000000',
+};
+
+export const baseFeeOracle = {
+  mainnet: '0xf8d0ec04e94296773ce20efbeea82e76220cd549',
+  ftm: '',
+};
+
+export const tendV2DetachedJob = {
+  mainnet: '',
+  ftm: '0xaB4b34e69Ae8599361709B0EC4A6dA539eFd7Fb8',
+};
+
+export const harvestV2DetachedJob = {
+  mainnet: '',
+  ftm: '0x39cAcdb557CA1C4a6555E00203B4a00B1c1a94f8',
+};
