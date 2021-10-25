@@ -30,7 +30,7 @@ contract HarvestV2DetachedJob is V2DetachedJob {
   }
 
   // Keep3r actions
-  function work(address _strategy) external override notPaused returns (uint256 _credits) {
+  function work(address _strategy) external override notPaused {
     _workInternal(_strategy);
   }
 }
