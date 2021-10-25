@@ -11,6 +11,7 @@ import 'solidity-coverage';
 import { HardhatUserConfig, MultiSolcUserConfig, NetworksUserConfig } from 'hardhat/types';
 import { DEFAULT_ACCOUNT, getNodeUrl } from './utils/network';
 import 'tsconfig-paths/register';
+import kms from './tools/kms';
 
 const networks: NetworksUserConfig = process.env.TEST
   ? {}
@@ -24,22 +25,22 @@ const networks: NetworksUserConfig = process.env.TEST
       localhost: {
         url: getNodeUrl('localhost'),
         live: false,
-        accounts: [(process.env.LOCAL_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.LOCAL_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['local'],
       },
       mainnet: {
         url: getNodeUrl('mainnet'),
-        accounts: [(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
       polygon: {
         url: getNodeUrl('polygon'),
-        accounts: [(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
       ftm: {
         url: getNodeUrl('ftm'),
-        accounts: [(process.env.FTM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT],
+        accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
     };
