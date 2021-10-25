@@ -2,12 +2,13 @@ import { run, ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../../utils/web3-utils';
 import * as contracts from '../../../utils/contracts';
 import * as accounts from '../../../utils/accounts';
-import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategies';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { v2FtmTendStrategies } from '../../../utils/v2-ftm-strategies';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({ message: 'correct address?' });
 const confirm = new Confirm({
-  message: 'Do you want to add strategies on v2 harvest stalth keep3r job?',
+  message: 'Do you want to add strategies to v2 ftm tend detached job?',
 });
 async function main() {
   await run('compile');
@@ -24,7 +25,7 @@ function promptAndSubmit(): Promise<void | Error> {
         method: 'hardhat_impersonateAccount',
         params: [accounts.yKeeper],
       });
-      const yKeeper: any = ethers.provider.getUncheckedSigner(accounts.yKeeper) as any;
+      const yKeeper: any = ethers.provider.getUncheckedSigner(accounts.yKeeper) as any as SignerWithAddress;
       yKeeper.address = yKeeper._address;
       signer = yKeeper;
     }
@@ -33,17 +34,13 @@ function promptAndSubmit(): Promise<void | Error> {
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
-          const harvestV2Keep3rStealthJob = await ethers.getContractAt(
-            'HarvestV2Keep3rStealthJob',
-            contracts.harvestV2Keep3rStealthJob.mainnet as string,
-            signer
-          );
+          const tendV2DetachedJob = await ethers.getContractAt('TendV2DetachedJob', contracts.tendV2DetachedJob.ftm, signer);
 
-          const jobStrategies = await harvestV2Keep3rStealthJob.callStatic.strategies();
+          const jobStrategies = await tendV2DetachedJob.callStatic.strategies();
 
-          const strategiesAdded = v2StealthStrategies.filter((strategy) => strategy.added).map((strategy) => strategy.address);
+          const strategiesAdded = v2FtmTendStrategies.filter((strategy) => strategy.added).map((strategy) => strategy.address);
 
-          const strategiesNotYetAdded = v2StealthStrategies.filter((strategy) => !strategy.added).map((strategy) => strategy.address);
+          const strategiesNotYetAdded = v2FtmTendStrategies.filter((strategy) => !strategy.added).map((strategy) => strategy.address);
 
           for (const strategyAdded of strategiesAdded) {
             if (jobStrategies.indexOf(strategyAdded) == -1)
@@ -60,12 +57,11 @@ function promptAndSubmit(): Promise<void | Error> {
               console.log(`strategy: ${jobStrategy} should not be on job, or is missing from config`);
           }
 
-          const strategiesToAdd = v2StealthStrategies
+          const strategiesToAdd = v2FtmTendStrategies
             .filter((strategy) => !strategy.added)
             .map((strategy) => ({
               name: strategy.name,
               address: strategy.address,
-              amount: strategy.amount,
               costToken: strategy.costToken ? strategy.costToken : ZERO_ADDRESS,
               costPair: strategy.costPair ? strategy.costPair : ZERO_ADDRESS,
             }));
@@ -74,30 +70,20 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log(strategiesToAdd);
           if (!(await confirm.run())) return;
 
-          const gasLimit = 200_000;
-          await harvestV2Keep3rStealthJob.callStatic.addStrategies(
+          await tendV2DetachedJob.callStatic.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
-            strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
-            strategiesToAdd.map((strategy) => strategy.costPair), // address _costPair
-            {
-              gasLimit,
-            }
+            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
           );
-
-          await harvestV2Keep3rStealthJob.addStrategies(
+          await tendV2DetachedJob.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
-            strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
-            strategiesToAdd.map((strategy) => strategy.costPair), // address _costPair
-            {
-              gasLimit,
-            }
+            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
           );
 
           resolve();
         } catch (err: any) {
-          reject(`Error while deploying v2 keep3r job contracts: ${err.message}`);
+          reject(`Error while adding strategies to v2 tend detached job: ${err.message}`);
         }
       } else {
         console.error('Aborted!');

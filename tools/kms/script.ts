@@ -12,7 +12,7 @@ const main = async () => {
           choices: ['encrypt', 'decrypt'],
         },
       ])
-      .then(async (answ) => {
+      .then(async (answ: any) => {
         if (answ.action === 'encrypt') {
           await encrypt();
         } else {
@@ -33,7 +33,7 @@ const encrypt = async (): Promise<void> => {
           name: 'toEncrypt',
         },
       ])
-      .then(async (answ) => {
+      .then(async (answ: any) => {
         const encryptedString = await kms.encrypt(answ.toEncrypt);
         console.log('Encrypted string:', encryptedString);
         resolve();
@@ -52,7 +52,7 @@ const decrypt = async (): Promise<void> => {
           name: 'toDecrypt',
         },
       ])
-      .then(async (answ) => {
+      .then(async (answ: any) => {
         const decryptedString = await kms.decrypt(answ.toDecrypt);
         console.log('Decrypted string:', decryptedString);
         resolve();

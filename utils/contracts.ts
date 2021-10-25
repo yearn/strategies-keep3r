@@ -87,5 +87,15 @@ export const yOracle: ContractChainAddress = {
 
 export const baseFeeOracle: ContractChainAddress = {
   mainnet: '0xf8d0ec04e94296773ce20efbeea82e76220cd549',
-  ftm: '0x29975c3B15E4B23A39197bfAF7195BeCd386Da6c',
+  ftm: '',
+};
+
+export const tendV2DetachedJob = {
+  mainnet: '',
+  ftm: '0xaB4b34e69Ae8599361709B0EC4A6dA539eFd7Fb8',
+};
+
+export const harvestV2DetachedJob = {
+  mainnet: '',
+  ftm: '0x39cAcdb557CA1C4a6555E00203B4a00B1c1a94f8',
 };
