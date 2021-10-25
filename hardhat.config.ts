@@ -33,6 +33,11 @@ const networks: NetworksUserConfig = process.env.TEST
         accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
+      rinkeby: {
+        url: getNodeUrl('rinkeby'),
+        accounts: kms.decryptSeveralSync([(process.env.RINKEBY_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
+        tags: ['production'],
+      },
       polygon: {
         url: getNodeUrl('polygon'),
         accounts: kms.decryptSeveralSync([(process.env.POLYGON_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
@@ -40,7 +45,7 @@ const networks: NetworksUserConfig = process.env.TEST
       },
       ftm: {
         url: getNodeUrl('ftm'),
-        accounts: kms.decryptSeveralSync([(process.env.MAINNET_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
+        accounts: kms.decryptSeveralSync([(process.env.FTM_PRIVATE_KEY as string) || DEFAULT_ACCOUNT]),
         tags: ['production'],
       },
     };

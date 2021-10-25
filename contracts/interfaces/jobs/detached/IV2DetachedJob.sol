@@ -21,6 +21,8 @@ interface IV2DetachedJob {
   event ForceWorked(address _strategy);
 
   // Getters
+  function v2Keeper() external view returns (address _v2Keeper);
+
   function strategies() external view returns (address[] memory);
 
   function workable(address _strategy) external view returns (bool);

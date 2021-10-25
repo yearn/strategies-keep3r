@@ -47,7 +47,7 @@ contract HarvestV2Keep3rStealthJob is V2Keep3rStealthJob {
 
   function _work(address _strategy) internal override {
     lastWorkAt[_strategy] = block.timestamp;
-    V2Keeper.harvest(_strategy);
+    IV2Keeper(v2Keeper).harvest(_strategy);
   }
 
   // Keep3r actions

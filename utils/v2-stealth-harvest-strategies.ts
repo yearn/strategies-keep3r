@@ -251,13 +251,13 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   },
   {
     name: 'convex_eurt',
-    added: false,
+    added: true,
     address: '0x5E10E27DEae12877e23A68cC0d6F1b134b4d517A',
     amount: 2_000_000,
   },
   {
     name: 'convex_mim',
-    added: false,
+    added: true,
     address: '0x6570B0a1593a59CcB378fb0b01A753875FCa99c4',
     amount: 2_000_000,
   },
@@ -267,12 +267,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
     amount: 2_000_000,
   },
-  {
-    name: 'weth_lev_comp',
-    added: true,
-    address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
-    amount: 2_000_000,
-  },
+  // {
+  //   name: 'weth_lev_comp',
+  //   added: true,
+  //   address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
+  //   amount: 2_000_000,
+  // },
   {
     name: 'dai_lev_comp',
     added: true,
@@ -285,12 +285,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0xE6c78b85f93c25B8EE7d963fD15d1d53a00F5908',
     amount: 2_000_000,
   },
-  {
-    name: 'wbtc_lev_comp',
-    added: true,
-    address: '0x4F3c19878da5366fd85648Ef8692D96067dEE16D',
-    amount: 2_000_000,
-  },
+  // {
+  //   name: 'wbtc_lev_comp',
+  //   added: true,
+  //   address: '0x4F3c19878da5366fd85648Ef8692D96067dEE16D',
+  //   amount: 2_000_000,
+  // },
   {
     name: 'dai_router',
     added: true,
@@ -311,14 +311,32 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   },
   {
     name: 'Gen Lender USDT',
-    added: false,
+    added: true,
     address: '0x2f87c5e8396F0C41b86aad4F3C8358aB21681952',
     amount: 2_000_000,
   },
   {
     name: 'GenericAave - USDT plugin',
-    added: false,
+    added: true,
     address: '0x41b51b0b9ECDD0ee54D82798e83Fd3B9562A7A3c',
+    amount: 2_000_000,
+  },
+  {
+    name: 'DAI lev comp',
+    added: true,
+    address: '0x62EA2aCe7a7861394f4A38B84D119498DBBb022c',
+    amount: 2_000_000,
+  },
+  {
+    name: 'USDC lev comp',
+    added: true,
+    address: '0xC0176FAa0e20dFf3CB6B810aEaE64ef271B1b64b',
+    amount: 2_000_000,
+  },
+  {
+    name: 'WBTC lev comp',
+    added: true,
+    address: '0x619Dde92f9fD8Af679025A2fD7e9ED2269e4c0c8',
     amount: 2_000_000,
   },
 ];

@@ -26,11 +26,11 @@ async function main() {
   const StealthVault: ContractFactory = await ethers.getContractFactory('StealthVault');
   const stealthVault = await StealthVault.deploy();
   const StealthRelayer: ContractFactory = await ethers.getContractFactory('StealthRelayer');
-  const stealthRelayer = (await StealthRelayer.deploy(stealthVault.address)).connect(signer);
-  // const stealthRelayer = await ethers.getContractAt(
-  //   'StealthRelayer',
-  //   config.contracts.mainnet.stealthRelayer
-  // );
+  // const stealthRelayer = (await StealthRelayer.deploy(stealthVault.address)).connect(signer);
+  const stealthRelayer = await ethers.getContractAt(
+    'StealthRelayer',
+    'config.contracts.mainnet.stealthRelayer' // FIX really outdated script
+  );
 
   // Setup crv strategy keep3r
   const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3rJob', config.contracts.mainnet.jobs.crvStrategyKeep3rJob, signer);

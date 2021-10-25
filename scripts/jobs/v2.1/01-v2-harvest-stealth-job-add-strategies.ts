@@ -3,7 +3,6 @@ import { e18, ZERO_ADDRESS } from '../../../utils/web3-utils';
 import * as contracts from '../../../utils/contracts';
 import * as accounts from '../../../utils/accounts';
 import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategies';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({ message: 'correct address?' });
@@ -25,7 +24,7 @@ function promptAndSubmit(): Promise<void | Error> {
         method: 'hardhat_impersonateAccount',
         params: [accounts.yKeeper],
       });
-      const yKeeper: any = ethers.provider.getUncheckedSigner(accounts.yKeeper) as any as SignerWithAddress;
+      const yKeeper: any = ethers.provider.getUncheckedSigner(accounts.yKeeper) as any;
       yKeeper.address = yKeeper._address;
       signer = yKeeper;
     }

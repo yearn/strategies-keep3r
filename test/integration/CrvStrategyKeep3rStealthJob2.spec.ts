@@ -101,8 +101,8 @@ describe('CrvStrategyKeep3rStealthJob2', () => {
     console.log({ workable });
 
     // Stealth contracts and setup
-    const stealthVault = await ethers.getContractAt('IStealthVault', contracts.stealthVault.mainnet, deployer);
-    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet, deployer);
+    const stealthVault = await ethers.getContractAt('IStealthVault', contracts.stealthVault.mainnet as string, deployer);
+    const stealthRelayer = await ethers.getContractAt('IStealthRelayer', contracts.stealthRelayer.mainnet as string, deployer);
     // Set job in stealth relayer
     await stealthRelayer.addJob(crvStrategyKeep3rStealthJob2.address);
 

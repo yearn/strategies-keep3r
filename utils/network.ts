@@ -1,5 +1,15 @@
 import 'dotenv/config';
 
+export type SUPPORTED_NETWORKS = 'mainnet' | 'rinkeby' | 'goerli' | 'polygon' | 'ftm';
+
+export const NETWORK_ID_NAMES: { [chainId: number]: SUPPORTED_NETWORKS } = {
+  1: 'mainnet',
+  4: 'rinkeby',
+  5: 'goerli',
+  137: 'polygon',
+  250: 'ftm',
+};
+
 export function getNodeUrl(networkName: string): string {
   if (networkName) {
     const uri = process.env[`ETH_NODE_URI_${networkName.toUpperCase()}`];
