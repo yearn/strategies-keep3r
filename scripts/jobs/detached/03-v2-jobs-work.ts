@@ -29,6 +29,8 @@ function promptAndSubmit(): Promise<void | Error> {
               console.log('working:', strategy);
               await tendV2DetachedJob.callStatic.work(strategy);
               await tendV2DetachedJob.work(strategy);
+              console.log('worked');
+              return resolve();
             } catch (error) {
               console.log(error);
             }
@@ -44,6 +46,8 @@ function promptAndSubmit(): Promise<void | Error> {
               console.log('working:', strategy);
               await harvestV2DetachedJob.callStatic.work(strategy);
               await harvestV2DetachedJob.work(strategy);
+              console.log('worked');
+              return resolve();
             } catch (error) {
               console.log(error);
             }
