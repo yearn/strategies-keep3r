@@ -28,11 +28,15 @@ function promptAndSubmit() {
       }
 
       const VaultsRegistryHelper: ContractFactory = await ethers.getContractFactory('VaultsRegistryHelper');
-      console.log(contracts.vaultsRegistry.ftm);
-      const vaultsRegistryHelper = await VaultsRegistryHelper.deploy(contracts.vaultsRegistry.ftm);
+      console.log(contracts.vaultsRegistry.mainnet);
+      const vaultsRegistryHelper = await VaultsRegistryHelper.deploy(contracts.vaultsRegistry.mainnet);
       console.log('VaultsRegistryHelper address:', vaultsRegistryHelper.address);
-      console.log('PLEASE: change .contracts.ts vaultsRegistryHelper.ftm address to:', vaultsRegistryHelper.address);
-
+      console.log('PLEASE: change .contracts.ts vaultsRegistryHelper.mainnet address to:', vaultsRegistryHelper.address);
+      const response = await vaultsRegistryHelper.getVaultsAndStrategies();
+      console.log(response._vaults);
+      console.log(response._strategies);
+      console.log(JSON.stringify(response._vaults));
+      console.log(JSON.stringify(response._strategies));
       resolve();
     } catch (err) {
       reject(err);
