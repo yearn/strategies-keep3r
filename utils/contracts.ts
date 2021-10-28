@@ -58,7 +58,7 @@ export const vaultsRegistry: ContractChainAddress = {
 };
 
 export const vaultsRegistryHelper: ContractChainAddress = {
-  mainnet: '',
+  mainnet: '0x52CbF68959e082565e7fd4bBb23D9Ccfb8C8C057',
   polygon: '',
   ftm: '0x8CC45f739104b3Bdb98BFfFaF2423cC0f817ccc1',
 };
