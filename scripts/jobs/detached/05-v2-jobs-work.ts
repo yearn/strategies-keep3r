@@ -60,11 +60,11 @@ function promptAndSubmit(): Promise<void | Error> {
           console.log(error);
         }
       }
-      return resolve();
     } catch (err: any) {
       reject(`Error while working harvest detached job: ${err.message}`);
     }
     console.log('no work');
+    return resolve();
   });
 }
 
