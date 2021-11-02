@@ -33,7 +33,7 @@ function promptAndSubmit(): Promise<void | Error> {
     }
 
     try {
-      const harvestCooldown = 20 * 60; // 20 minutes
+      const harvestCooldown = 10 * 60; // 10 minutes
       const harvestV2DetachedJob = await ethers.getContractAt('HarvestV2DetachedJob', contracts.harvestV2DetachedJob[networkName]);
       const strategies = await harvestV2DetachedJob.callStatic.strategies();
       console.log(`checking ${strategies.length} harvestV2DetachedJob strategies`);
