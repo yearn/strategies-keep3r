@@ -1,4 +1,6 @@
-# Strategies Keep3r
+# [DEPRECATED] Strategies Keep3r
+
+THIS REPOSITORY HAS BEEN MOVED [HERE](https://github.com/yearn/hardhat-monorepo/tree/main/packages/strategies-keep3r)
 
 ## Wishlist
 
